@@ -365,6 +365,10 @@ public final class FortuneClient {
   private static final LinkedHashMap<net.minecraft.core.BlockPos, ChestEntity> VISIBLE_CHESTS =
       new LinkedHashMap<>();
 
+  private static final float DISPLAY_SIZE = .62F;
+  // Keep the paper's lower edge just above the wooden lid, using the same plane for aiming.
+  private static final double DISPLAY_CENTER_Y = BlockGeometry.CHEST_TOP + .04 + DISPLAY_SIZE / 2;
+
   public static final class DisplayRenderer implements BlockEntityRenderer<ChestEntity> {
     public DisplayRenderer(BlockEntityRendererProvider.Context c) {}
 
@@ -381,10 +385,10 @@ public final class FortuneClient {
         VISIBLE_CHESTS.remove(VISIBLE_CHESTS.keySet().iterator().next());
       try {
         pose.pushPose();
-        pose.translate(.5, 2.05, .5);
+        pose.translate(.5, DISPLAY_CENTER_Y, .5);
         Direction facing = chest.getBlockState().getValue(FortuneBlock.FACING);
         pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-facing.toYRot()));
-        pose.scale(.62F, .62F, .62F);
+        pose.scale(DISPLAY_SIZE, DISPLAY_SIZE, DISPLAY_SIZE);
         var mc = Minecraft.getInstance();
         TextureAtlasSprite paper =
             mc.getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
@@ -480,7 +484,7 @@ public final class FortuneClient {
           continue;
         }
         if (chest.display.isBlank()) continue;
-        Vec3 mid = Vec3.atCenterOf(pos).add(0, 1.55, 0);
+        Vec3 mid = Vec3.atLowerCornerOf(pos).add(.5, DISPLAY_CENTER_Y, .5);
         if (mid.distanceToSqr(eye) > 49) continue;
         Direction facing = chest.getBlockState().getValue(FortuneBlock.FACING);
         Vec3 normal = Vec3.atLowerCornerOf(facing.getNormal());
@@ -493,7 +497,7 @@ public final class FortuneClient {
         double distance = eye.distanceToSqr(point);
         Vec3 local = point.subtract(mid);
         Vec3 right = new Vec3(normal.z, 0, -normal.x);
-        double u = .5 + local.dot(right) / .62, v = .5 - local.y / .62;
+        double u = .5 + local.dot(right) / DISPLAY_SIZE, v = .5 - local.y / DISPLAY_SIZE;
         if (distance < nearest && SlipShape.opaque(u, v)) {
           target = chest;
           nearest = distance;

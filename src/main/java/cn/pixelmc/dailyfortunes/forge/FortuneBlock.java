@@ -13,6 +13,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.*;
 import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public final class FortuneBlock extends BaseEntityBlock {
   public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -42,6 +44,18 @@ public final class FortuneBlock extends BaseEntityBlock {
 
   public RenderShape getRenderShape(BlockState s) {
     return RenderShape.MODEL;
+  }
+
+  @Override
+  public VoxelShape getShape(
+      BlockState s, BlockGetter level, BlockPos pos, CollisionContext context) {
+    return BlockGeometry.shape(chest, s.getValue(FACING));
+  }
+
+  @Override
+  public VoxelShape getCollisionShape(
+      BlockState s, BlockGetter level, BlockPos pos, CollisionContext context) {
+    return BlockGeometry.shape(chest, s.getValue(FACING));
   }
 
   public BlockEntity newBlockEntity(BlockPos p, BlockState s) {

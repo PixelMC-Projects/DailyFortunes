@@ -4,7 +4,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.github.johnrengelman.shadow'
-version='0.1.1'
+version='0.1.2'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-forge-1.20.1' }
 java { toolchain { languageVersion=JavaLanguageVersion.of(17) } }
@@ -57,6 +57,7 @@ tasks.register('packagedStorageChecks',JavaExec) {
  classpath=files(tasks.named('shadowJar').flatMap { it.archiveFile }) + sourceSets.checks.runtimeClasspath
  mainClass='cn.pixelmc.dailyfortunes.ServiceChecks'
  systemProperty 'dailyfortunes.packaged','true'
+ doFirst { systemProperty 'dailyfortunes.packagedJar',tasks.named('shadowJar').get().archiveFile.get().asFile.absolutePath }
 }
 tasks.named('check') { dependsOn 'packagedStorageChecks' }
 

@@ -41,12 +41,9 @@ public final class ServiceChecks {
   public static void main(String[] args) throws Exception {
     if (Boolean.getBoolean("dailyfortunes.packaged")) {
       check(
-          FortuneBackend.class
-              .getProtectionDomain()
-              .getCodeSource()
-              .getLocation()
-              .getPath()
-              .endsWith("dailyfortunes-forge-1.20.1-0.1.1.jar"),
+          Path.of(FortuneBackend.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+              .toRealPath()
+              .equals(Path.of(System.getProperty("dailyfortunes.packagedJar")).toRealPath()),
           "packaged backend is loaded first");
       check(
           Class.forName("cn.pixelmc.dailyfortunes.vendor.h2.Driver") != null,

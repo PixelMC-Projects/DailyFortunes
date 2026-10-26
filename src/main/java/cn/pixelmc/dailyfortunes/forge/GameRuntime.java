@@ -107,7 +107,7 @@ public final class GameRuntime {
       } else if (remote) {
         Class.forName("com.pixelmc.pixelmcmanager.api.ManagerBridgeApi")
             .getMethod("register", String.class, String.class, String.class, String.class)
-            .invoke(null, "dailyfortunes", "DailyFortunes", "0.1.1", "每日抽签,玩家签历,永久收藏,解签龛");
+            .invoke(null, "dailyfortunes", "DailyFortunes", "0.1.2", "每日抽签,玩家签历,永久收藏,解签龛");
       } else {
         JsonObject db = config.getAsJsonObject("database");
         backend = new FortuneBackend(s(db, "url"), s(db, "user"), s(db, "password"), dir);
