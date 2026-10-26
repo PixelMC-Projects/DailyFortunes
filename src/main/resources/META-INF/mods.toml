@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="AGPL-3.0-only"
+[[mods]]
+modId="dailyfortunes"
+version="0.1.0"
+displayName="DailyFortunes"
+authors="PixelMC Projects"
+description='''每日抽签、解签与永久签历收藏。Daily fortunes and persistent personal calendars.'''
+[[dependencies.dailyfortunes]]
+modId="forge"
+mandatory=true
+versionRange="[47.3.0,)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.dailyfortunes]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1,1.21)"
+ordering="NONE"
+side="BOTH"

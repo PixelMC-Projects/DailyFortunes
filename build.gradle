@@ -1,0 +1,43 @@
+buildscript {
+ repositories { maven { url='https://maven.aliyun.com/repository/public' }; maven { url='https://maven.minecraftforge.net' }; mavenCentral() }
+ dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.54' }
+}
+apply plugin: 'net.minecraftforge.gradle'
+version='0.1.0'
+group='cn.pixelmc.dailyfortunes'
+base { archivesName='dailyfortunes-forge-1.20.1' }
+java { toolchain { languageVersion=JavaLanguageVersion.of(17) } }
+minecraft {
+ mappings channel:'official',version:'1.20.1'
+ runs {
+  configureEach { workingDirectory project.file('run'); mods { dailyfortunes { source sourceSets.main } } }
+  client {}
+  server { args '--nogui' }
+ }
+}
+repositories { maven { url='https://maven.aliyun.com/repository/public' }; maven { url='https://bmclapi2.bangbang93.com/maven' } }
+repositories.configureEach { repo -> if(repo instanceof MavenArtifactRepository) { if(repo.url.host in ['maven.minecraftforge.net','libraries.minecraft.net']) repo.url='https://bmclapi2.bangbang93.com/maven'; if(repo.url.host in ['repo.maven.apache.org','repo1.maven.org']) repo.url='https://maven.aliyun.com/repository/public' } }
+configurations { jdbcDriver; compileOnly.extendsFrom jdbcDriver; runtimeOnly.extendsFrom jdbcDriver }
+dependencies { minecraft 'net.minecraftforge:forge:1.20.1-47.3.33'; jdbcDriver('org.mariadb.jdbc:mariadb-java-client:3.5.6') { transitive=false }; jdbcDriver('com.h2database:h2:2.3.232') { transitive=false } }
+tasks.named('jar',Jar).configure {
+ from({configurations.jdbcDriver.collect{zipTree(it)}}) { exclude 'META-INF/MANIFEST.MF','META-INF/*.SF','META-INF/*.RSA','META-INF/*.DSA','module-info.class','META-INF/versions/**','META-INF/services/java.sql.Driver' }
+ from('LICENSE','NOTICE','THIRD_PARTY.md')
+ finalizedBy 'reobfJar'
+}
+tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
+sourceSets { checks { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath + configurations.jdbcDriver } }
+tasks.register('serviceChecks',JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.ServiceChecks' }
+tasks.named('check') { dependsOn 'serviceChecks' }
+sourceSets { visual { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath } }
+minecraft.runs {
+ visualClient {
+  parent minecraft.runs.client
+  client true
+  workingDirectory project.file('run-visual')
+  mods { dailyfortunes { source sourceSets.visual } }
+  args '--username','FortuneTester','--width','1280','--height','800'
+ }
+}
+
+tasks.register("serviceRegressionChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.ServiceRegressionChecks" }
+tasks.named("check") { dependsOn "serviceRegressionChecks" }

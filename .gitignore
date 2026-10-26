@@ -1,0 +1,11 @@
+.gradle/
+build/
+run*/
+logs/
+libs/
+releases/
+*.log
+*.hprof
+.local*/
+.idea/
+*.iml
