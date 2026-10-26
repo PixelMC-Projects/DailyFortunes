@@ -35,4 +35,4 @@ Use `/df recover yyyy-MM-dd` to recover an unarchived result. Opening the archiv
 
 ## License / 许可
 
-Copyright © 2026 PixelMC Projects. [AGPL-3.0-only](LICENSE). Preserve author and copyright notices; modified distributions and network-accessible versions must provide corresponding source under the license. 自制模型、纹理及签文随本项目提供；第三方组件见 [THIRD_PARTY.md](THIRD_PARTY.md)。
+Copyright © 2026 zhan_cpu / PixelMC Projects. [AGPL-3.0-only](LICENSE). Preserve author and copyright notices; modified distributions and network-accessible versions must provide corresponding source under the license. 自制模型、纹理及签文随本项目提供；第三方组件见 [THIRD_PARTY.md](THIRD_PARTY.md)。

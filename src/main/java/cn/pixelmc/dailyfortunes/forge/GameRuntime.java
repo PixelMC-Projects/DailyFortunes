@@ -347,13 +347,16 @@ public final class GameRuntime {
         p.getUUID(), new Session(p.level().dimension().location().toString(), pos.immutable()));
     List<JsonObject> items = new ArrayList<>();
     Set<String> seen = new HashSet<>();
-    for (ItemStack stack : p.getInventory().items) {
+    for (int slot = 0; slot < p.getInventory().getContainerSize(); slot++) {
+      ItemStack stack = p.getInventory().getItem(slot);
       JsonObject record = FortuneItem.receipt(stack);
       if (stack.is(DailyFortunes.SLIP.get())
           && record != null
           && s(record, "player").equals(p.getUUID().toString())
           && seen.add(s(record, "token"))) items.add(record);
     }
+    java.util.concurrent.atomic.AtomicInteger failures =
+        new java.util.concurrent.atomic.AtomicInteger();
     r.run(
         p,
         () -> {
@@ -365,6 +368,7 @@ public final class GameRuntime {
                         r.call(p, "archive", s(record, "date"), s(record, "token"))
                             .handle(
                                 (result, error) -> {
+                                  if (error != null) failures.incrementAndGet();
                                   if (error == null)
                                     r.server.execute(
                                         () -> {
@@ -375,7 +379,10 @@ public final class GameRuntime {
                                 }));
           return f.thenCompose(unused -> r.call(p, "calendar", ""));
         },
-        v -> r.calendar(p, v),
+        v -> {
+          if (failures.get() > 0) message(p, "部分签笺暂未存入，实物已保留；请稍后再打开藏签匣。");
+          r.calendar(p, v);
+        },
         true);
   }
 

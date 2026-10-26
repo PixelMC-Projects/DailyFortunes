@@ -1,8 +1,9 @@
 buildscript {
- repositories { maven { url='https://maven.aliyun.com/repository/public' }; maven { url='https://maven.minecraftforge.net' }; mavenCentral() }
- dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.54' }
+ repositories { maven { url='https://maven.aliyun.com/repository/public' }; maven { url='https://maven.minecraftforge.net' }; maven { url='https://maven.aliyun.com/repository/gradle-plugin' }; maven { url='https://plugins.gradle.org/m2/' }; mavenCentral() }
+ dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.54'; classpath 'com.github.johnrengelman:shadow:8.1.1' }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'com.github.johnrengelman.shadow'
 version='0.1.0'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-forge-1.20.1' }
@@ -19,11 +20,19 @@ repositories { maven { url='https://maven.aliyun.com/repository/public' }; maven
 repositories.configureEach { repo -> if(repo instanceof MavenArtifactRepository) { if(repo.url.host in ['maven.minecraftforge.net','libraries.minecraft.net']) repo.url='https://bmclapi2.bangbang93.com/maven'; if(repo.url.host in ['repo.maven.apache.org','repo1.maven.org']) repo.url='https://maven.aliyun.com/repository/public' } }
 configurations { jdbcDriver; compileOnly.extendsFrom jdbcDriver; runtimeOnly.extendsFrom jdbcDriver }
 dependencies { minecraft 'net.minecraftforge:forge:1.20.1-47.3.33'; jdbcDriver('org.mariadb.jdbc:mariadb-java-client:3.5.6') { transitive=false }; jdbcDriver('com.h2database:h2:2.3.232') { transitive=false } }
-tasks.named('jar',Jar).configure {
- from({configurations.jdbcDriver.collect{zipTree(it)}}) { exclude 'META-INF/MANIFEST.MF','META-INF/*.SF','META-INF/*.RSA','META-INF/*.DSA','module-info.class','META-INF/versions/**','META-INF/services/java.sql.Driver' }
+// Relocate embedded JDBC drivers: Titles also bundles MariaDB, and Forge uses named modules.
+tasks.named('jar',Jar).configure { archiveClassifier='unshaded-dev'; from('LICENSE','NOTICE','THIRD_PARTY.md') }
+tasks.named('shadowJar').configure {
+ archiveClassifier=''
+ configurations=[project.configurations.jdbcDriver]
+ relocate 'org.mariadb.jdbc', 'cn.pixelmc.dailyfortunes.vendor.mariadb'
+ relocate 'org.h2', 'cn.pixelmc.dailyfortunes.vendor.h2'
+ mergeServiceFiles()
+ exclude 'META-INF/*.SF','META-INF/*.RSA','META-INF/*.DSA','module-info.class','META-INF/versions/**'
  from('LICENSE','NOTICE','THIRD_PARTY.md')
- finalizedBy 'reobfJar'
 }
+reobf { shadowJar {} }
+tasks.named('build') { dependsOn 'reobfShadowJar' }
 tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
 sourceSets { checks { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath + configurations.jdbcDriver } }
 tasks.register('serviceChecks',JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.ServiceChecks' }
@@ -41,3 +50,11 @@ minecraft.runs {
 
 tasks.register("serviceRegressionChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.ServiceRegressionChecks" }
 tasks.named("check") { dependsOn "serviceRegressionChecks" }
+
+tasks.register('packagedStorageChecks',JavaExec) {
+ dependsOn 'reobfShadowJar','checksClasses'
+ classpath=files(tasks.named('shadowJar').flatMap { it.archiveFile }) + sourceSets.checks.runtimeClasspath
+ mainClass='cn.pixelmc.dailyfortunes.ServiceChecks'
+ systemProperty 'dailyfortunes.packaged','true'
+}
+tasks.named('check') { dependsOn 'packagedStorageChecks' }

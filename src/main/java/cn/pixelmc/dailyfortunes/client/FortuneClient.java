@@ -216,53 +216,61 @@ public final class FortuneClient {
       return false;
     }
 
+    private int weeks() {
+      return (month.atDay(1).getDayOfWeek().getValue() % 7 + month.lengthOfMonth() + 6) / 7;
+    }
+
     public void render(GuiGraphics g, int mx, int my, float pt) {
       renderBackground(g);
       int x = width / 2 - 144, y = height / 2 - 106;
       art(g, texture("gui/fortune_page_background"), width / 2 - 193, y - 33, 386, 270);
-      g.drawString(
-          font, month.toString().replace('-', '/'), width / 2 - 18, y + 7, 0x514738, false);
+      String heading = month.toString().replace('-', '/');
+      g.drawString(font, heading, width / 2 - font.width(heading) / 2, y + 18, 0x514738, false);
       int offset = month.atDay(1).getDayOfWeek().getValue() % 7;
-      int row0 = y + 28;
-      for (int row = 0; row < 6; row++)
+      int rows = weeks(), cellHeight = 132 / rows, row0 = y + 34;
+      for (int row = 0; row < rows; row++) {
         for (int col = 0; col < 9; col++) {
-          int px = x + col * 32, py = row0 + row * 26;
-          g.fill(px + 1, py + 1, px + 31, py + 25, 0x33564C3E);
+          int px = x + col * 32, py = row0 + row * cellHeight;
           if (col == 0 || col == 8) {
-            if (row == 2)
-              g.drawCenteredString(font, col == 0 ? "‹" : "›", px + 16, py + 9, 0xFFBC985A);
+            if (row == rows / 2) {
+              if (mx >= px && mx < px + 32 && my >= py && my < py + cellHeight)
+                g.fill(px + 5, py + 2, px + 27, py + cellHeight - 2, 0x22564C3E);
+              g.drawString(
+                  font, col == 0 ? "<" : ">", px + 13, py + cellHeight / 2 - 4, 0x80643E, false);
+            }
             continue;
           }
           int day = row * 7 + col - offset;
           if (day < 1 || day > month.lengthOfMonth()) continue;
+          g.fill(px + 1, py + 1, px + 31, py + cellHeight - 1, 0x33564C3E);
           String date = month.atDay(day).toString();
           JsonObject r = records.get(date);
+          int itemY = py + (cellHeight - 16) / 2;
           if (r != null && s(r, "state").equals("archived")) {
-            g.fill(px + 2, py + 2, px + 30, py + 24, 0x55333333);
-            g.renderItem(FortuneItem.stack(r), px + 8, py + 6);
+            g.fill(px + 2, py + 2, px + 30, py + cellHeight - 2, 0x55333333);
+            g.renderItem(FortuneItem.stack(r), px + 8, itemY);
             int color = FortuneItem.gradeColor(s(r.getAsJsonObject("snapshot"), "grade"));
-            g.fill(px + 25, py + 19, px + 30, py + 24, 0xFF000000 | color);
+            g.fill(px + 25, py + cellHeight - 7, px + 30, py + cellHeight - 2, 0xFF000000 | color);
           } else {
             RenderSystem.setShaderColor(1, 1, 1, .22F);
-            art(g, texture("item/fortune_slip"), px + 8, py + 6, 16, 16);
+            art(g, texture("item/fortune_slip"), px + 8, itemY, 16, 16);
             RenderSystem.setShaderColor(1, 1, 1, 1);
           }
           g.drawString(font, String.valueOf(day), px + 3, py + 3, 0x6A5944, false);
-          if (date.equals(selected)) g.renderOutline(px, py, 32, 26, 0xFFD6B66A);
+          if (date.equals(selected)) g.renderOutline(px, py, 32, cellHeight, 0xFFD6B66A);
         }
-      g.drawCenteredString(font, "左键阅读 · 右键展示 · 中键清除展示", width / 2, y + 192, 0x9F865C);
+      }
+      String help = "左键阅读 · 右键展示 · 中键清除展示";
+      g.drawString(font, help, width / 2 - font.width(help) / 2, y + 174, 0x806A48, false);
       super.render(g, mx, my, pt);
     }
 
     public boolean mouseClicked(double mx, double my, int button) {
-      int x = width / 2 - 144,
-          y = height / 2 - 106,
-          col = (int) Math.floor((mx - x) / 32),
-          row = (int) Math.floor((my - y - 28) / 26);
-      if (row >= 0 && row < 6 && col >= 0 && col < 9) {
-        if ((col == 0 || col == 8) && row == 2) {
-          month = month.plusMonths(col == 0 ? -1 : 1);
-          FortuneNetwork.request("calendar", month.toString());
+      int x = width / 2 - 144, y = height / 2 - 106, rows = weeks(), cellHeight = 132 / rows;
+      int col = (int) Math.floor((mx - x) / 32), row = (int) Math.floor((my - y - 34) / cellHeight);
+      if (row >= 0 && row < rows && col >= 0 && col < 9) {
+        if ((col == 0 || col == 8) && row == rows / 2) {
+          FortuneNetwork.request("calendar", month.plusMonths(col == 0 ? -1 : 1).toString());
           return true;
         }
         if (button == 2 && b(data, "canDisplay")) {
