@@ -59,21 +59,51 @@ public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
     for (var model : STICKS) e.register(model);
   }
 
+  private static final String[] ITEM_NAMES = {
+    "fortune_barrel", "interpretation_shrine", "collection_chest"
+  };
+
+  @SubscribeEvent
+  public static void guiModels(ModelEvent.RegisterAdditional e) {
+    for (String name : ITEM_NAMES)
+      e.register(new ResourceLocation(DailyFortunes.ID, "item/" + name + "_gui"));
+    e.register(new ResourceLocation(DailyFortunes.ID, "item/fortune_slip_outline"));
+  }
+
   @SubscribeEvent
   public static void baked(ModelEvent.ModifyBakingResult e) {
-    var key =
-        new ModelResourceLocation(
-            new ResourceLocation(DailyFortunes.ID, "fortune_barrel"), "inventory");
-    BakedModel original = e.getModels().get(key);
-    if (original != null)
+    for (String name : ITEM_NAMES) {
+      var key =
+          new ModelResourceLocation(new ResourceLocation(DailyFortunes.ID, name), "inventory");
+      BakedModel original = e.getModels().get(key);
+      BakedModel gui =
+          e.getModels().get(new ResourceLocation(DailyFortunes.ID, "item/" + name + "_gui"));
+      if (original == null || gui == null) continue;
+      boolean barrel = name.equals("fortune_barrel");
       e.getModels()
           .put(
               key,
               new BakedModelWrapper<>(original) {
+                @Override
                 public boolean isCustomRenderer() {
-                  return true;
+                  return barrel;
+                }
+
+                @Override
+                public boolean usesBlockLight() {
+                  return false;
+                }
+
+                @Override
+                public BakedModel applyTransform(
+                    ItemDisplayContext context, PoseStack pose, boolean leftHand) {
+                  if (context == ItemDisplayContext.GUI)
+                    return gui.applyTransform(context, pose, leftHand);
+                  original.applyTransform(context, pose, leftHand);
+                  return this;
                 }
               });
+    }
   }
 
   private static boolean sameBarrel(ItemStack stack, String id) {
@@ -82,6 +112,7 @@ public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
         && stack.getTag().getUUID("BarrelId").toString().equals(id);
   }
 
+  // Item.initializeClient runs during its superclass constructor; registration is unconditional.
   @Override
   public void renderByItem(
       ItemStack stack,
@@ -125,10 +156,10 @@ public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
         double angle = Math.toRadians(yaw), dx = (vx - motion.vx) * 20, dz = (vz - motion.vz) * 20;
         if (motion.sampled) {
           double impulseX =
-              -(dx * Math.cos(angle) + dz * Math.sin(angle)) * .07
-                  - Mth.wrapDegrees(yaw - motion.yaw) * .003;
+              -(dx * Math.cos(angle) + dz * Math.sin(angle)) * .11
+                  - Mth.wrapDegrees(yaw - motion.yaw) * .018;
           double impulseZ =
-              -(dz * Math.cos(angle) - dx * Math.sin(angle)) * .07 - (pitch - motion.pitch) * .003;
+              -(dz * Math.cos(angle) - dx * Math.sin(angle)) * .11 - (pitch - motion.pitch) * .018;
           motion.physics.impulse(impulseX, impulseZ, -(vy - motion.vy) * 1.4);
         }
         motion.physics.advance(dt, 0, 0, 0);
@@ -146,8 +177,8 @@ public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
         double[] pivot = StickPhysics.PIVOTS[i];
         var phys = motion.physics;
         pose.translate(pivot[0], pivot[1] + phys.y[i], pivot[2]);
-        pose.mulPose(Axis.XP.rotation((float) ((phys.z[i] - pivot[2]) * 2.6)));
-        pose.mulPose(Axis.ZP.rotation((float) (-(phys.x[i] - pivot[0]) * 2.6)));
+        pose.mulPose(Axis.XP.rotation((float) ((phys.z[i] - pivot[2]) * 3.5)));
+        pose.mulPose(Axis.ZP.rotation((float) (-(phys.x[i] - pivot[0]) * 3.5)));
         pose.translate(-pivot[0], -pivot[1], -pivot[2]);
       }
       renderer.renderModelLists(

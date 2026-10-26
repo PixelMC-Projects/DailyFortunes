@@ -11,7 +11,9 @@
 
 **Minecraft 1.20.1 / Forge 47.3+，客户端和服务端都需要安装。** 当前为首次客户端验收版本，尚未发布发行版。
 
-单人游戏只需将 JAR 放入 `mods`。默认使用内置本地数据库，数据保存在游戏目录的 `config/dailyfortunes/local-data`，无需另装数据库。进入世界后等待约 10 秒加载签历。
+当前模型采用轻度有损派生版本：细小凸饰转入贴图，保留主体轮廓与主要植物。三个模型合计 2,355 个四边面，较上一版减少 23.4%；原始美术蓝本不改。本轮客户端实测待用户完成，不创建新发行版。
+
+单人游戏只需将 JAR 放入 `mods`。默认使用内置本地数据库，数据保存在游戏目录的 `config/dailyfortunes/local-data/worlds/<存档ID>`，无需另装数据库。进入世界后等待约 10 秒加载签历。
 
 签筒、解签龛、藏签匣可用竹子、木材、铜、纸等原版材料合成。`/df recover yyyy-MM-dd` 补领已抽取但尚未收藏的原签。打开藏签匣自动收存背包里的已解签笺；左键阅读，右键选择展示，中键清除展示。
 
@@ -23,7 +25,7 @@
 
 不使用 Manager 时可设 `mode: database` 并填写本模组 MariaDB 配置。两种方式只能选择一个数据管理入口，避免为同一批玩家配置不同数据库。不要把服务端凭据发给客户端。
 
-数据与游戏存档分开保存；删世界或拆掉藏签匣不会删除收藏。默认每 12 小时创建本地备份，保留 30 天，可调整。异地备份必须额外包含 DailyFortunes 数据，现有称号备份不会自动包含它。
+服务器数据与游戏存档分开保存；拆掉藏签匣不会删除收藏。单人模式按存档ID隔离，换新存档可重新抽签，旧版全局测试库保留但不自动导入。默认每 12 小时创建本地备份，保留 30 天，可调整。异地备份必须额外包含 DailyFortunes 数据，现有称号备份不会自动包含它。
 
 ## English
 
@@ -31,7 +33,9 @@ Draw one fortune each day, interpret it at a wooden shrine, and keep it permanen
 
 Install on **both sides with Minecraft 1.20.1 / Forge 47.3+**. Singleplayer uses an embedded database automatically. For multiplayer web management, run PixelMC Manager with a separate MariaDB database and account for DailyFortunes, enable `fortunesEnabled`, configure `fortunesDatabase` and the game bridge. Without Manager, select `mode: database` in `config/dailyfortunes/server.json`.
 
-Use `/df recover yyyy-MM-dd` to recover an unarchived result. Opening the archive stores your interpreted slips; left-click to read, right-click to display. Collections survive world changes. Include this database separately in offsite backups.
+The current lightly lossy runtime models bake small raised details into textures while keeping the main shapes and foliage. Their combined 2,355 quads are 23.4% fewer than the previous version. Original art masters remain unchanged; this revision awaits the user's client playtest and has no new Release.
+
+Use `/df recover yyyy-MM-dd` to recover an unarchived result. Opening the archive stores your interpreted slips; left-click to read, right-click to display. Server collections survive world changes; singleplayer saves have separate quotas and collections. Include this database separately in offsite backups.
 
 ## License / 许可
 

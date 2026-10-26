@@ -16,10 +16,12 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.*;
 import net.minecraftforge.api.distmarker.Dist;
@@ -34,6 +36,13 @@ import net.minecraftforge.fml.common.Mod;
 public final class FortuneClient {
   public static ResourceLocation texture(String path) {
     return new ResourceLocation(DailyFortunes.ID, "textures/" + path + ".png");
+  }
+
+  @SubscribeEvent
+  public static void reload(RegisterClientReloadListenersEvent e) {
+    e.registerReloadListener(
+        (net.minecraft.server.packs.resources.ResourceManagerReloadListener)
+            manager -> SlipShape.clear());
   }
 
   @SubscribeEvent
@@ -88,6 +97,7 @@ public final class FortuneClient {
     private final JsonObject record;
     private final Screen parent;
     private int scroll;
+    private boolean dragging;
 
     ReadingScreen(JsonObject r, Screen parent) {
       super(Component.literal("解签"));
@@ -96,6 +106,7 @@ public final class FortuneClient {
     }
 
     protected void init() {
+      lastScroll = null;
       int w = Math.min(560, width - 20), h = w * 2 / 3;
       addRenderableWidget(
           new CloseButton((width + w) / 2 - 44, (height - h) / 2 + 25, this::onClose));
@@ -112,6 +123,34 @@ public final class FortuneClient {
     public boolean mouseScrolled(double x, double y, double delta) {
       scroll = Math.max(0, scroll - (int) Math.signum(delta) * 2);
       return true;
+    }
+
+    @Override
+    public boolean mouseClicked(double x, double y, int button) {
+      if (button == 0
+          && lastScroll != null
+          && lastScroll.maximum > 0
+          && lastScroll.contains(x, y)) {
+        dragging = true;
+        scroll = lastScroll.at(y);
+        return true;
+      }
+      return super.mouseClicked(x, y, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double x, double y, int button, double dx, double dy) {
+      if (dragging && lastScroll != null) {
+        scroll = lastScroll.at(y);
+        return true;
+      }
+      return super.mouseDragged(x, y, button, dx, dy);
+    }
+
+    @Override
+    public boolean mouseReleased(double x, double y, int button) {
+      dragging = false;
+      return super.mouseReleased(x, y, button);
     }
 
     public void render(GuiGraphics g, int mx, int my, float pt) {
@@ -166,20 +205,41 @@ public final class FortuneClient {
                 Component.literal(" 所得    " + s(r, "date").replace('-', '/'))
                     .withStyle(style -> style.withColor(0x99733E)));
     g.drawString(font, owner, left, bottom - 8, 0x99733E, false);
-    if (lines.size() > rows)
-      g.drawString(
-          font,
-          (hover ? "滚轮查看全部解签" : "滚轮翻阅")
-              + "  "
-              + (scroll + 1)
-              + "/"
-              + Math.max(1, lines.size() - rows + 1),
-          left,
-          bottom + 8,
-          0x8A806E,
-          false);
+    lastScroll =
+        new ScrollArea(
+            right + 7,
+            top + 31,
+            4,
+            Math.max(16, bottom - top - 49),
+            Math.max(0, lines.size() - rows));
+    if (lastScroll.maximum > 0) {
+      int thumb = Math.max(12, lastScroll.height * rows / lines.size());
+      int sy = lastScroll.y + (lastScroll.height - thumb) * scroll / lastScroll.maximum;
+      g.fill(
+          lastScroll.x,
+          lastScroll.y,
+          lastScroll.x + 4,
+          lastScroll.y + lastScroll.height,
+          0x386F5B42);
+      g.fill(lastScroll.x, sy, lastScroll.x + 4, sy + thumb, 0xC5A68B59);
+    }
     return scroll;
   }
+
+  private record ScrollArea(int x, int y, int width, int height, int maximum) {
+    boolean contains(double mx, double my) {
+      return mx >= x - 3 && mx < x + width + 3 && my >= y && my < y + height;
+    }
+
+    int at(double mouseY) {
+      return Math.max(
+          0,
+          Math.min(
+              maximum, (int) Math.round((mouseY - y) / (double) Math.max(1, height) * maximum)));
+    }
+  }
+
+  private static ScrollArea lastScroll;
 
   private static int darken(int rgb) {
     return ((int) (((rgb >> 16) & 255) * .62) << 16)
@@ -247,7 +307,6 @@ public final class FortuneClient {
           JsonObject r = records.get(date);
           int itemY = py + (cellHeight - 16) / 2;
           if (r != null && s(r, "state").equals("archived")) {
-            g.fill(px + 2, py + 2, px + 30, py + cellHeight - 2, 0x55333333);
             g.renderItem(FortuneItem.stack(r), px + 8, itemY);
             int color = FortuneItem.gradeColor(s(r.getAsJsonObject("snapshot"), "grade"));
             g.fill(px + 25, py + cellHeight - 7, px + 30, py + cellHeight - 2, 0xFF000000 | color);
@@ -263,6 +322,15 @@ public final class FortuneClient {
       String help = "左键阅读 · 右键展示 · 中键清除展示";
       g.drawString(font, help, width / 2 - font.width(help) / 2, y + 174, 0x806A48, false);
       super.render(g, mx, my, pt);
+      int hoverCol = (mx - x) / 32, hoverRow = (my - row0) / cellHeight;
+      if (mx >= x + 32 && mx < x + 256 && my >= row0 && hoverRow >= 0 && hoverRow < rows) {
+        int day = hoverRow * 7 + hoverCol - offset;
+        if (day >= 1 && day <= month.lengthOfMonth()) {
+          JsonObject hovered = records.get(month.atDay(day).toString());
+          if (hovered != null && s(hovered, "state").equals("archived"))
+            g.renderTooltip(font, FortuneItem.stack(hovered), mx, my);
+        }
+      }
     }
 
     public boolean mouseClicked(double mx, double my, int button) {
@@ -312,39 +380,21 @@ public final class FortuneClient {
       while (VISIBLE_CHESTS.size() > 256)
         VISIBLE_CHESTS.remove(VISIBLE_CHESTS.keySet().iterator().next());
       try {
-        JsonObject r = JsonParser.parseString(chest.display).getAsJsonObject();
         pose.pushPose();
         pose.translate(.5, 2.05, .5);
-        pose.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
+        Direction facing = chest.getBlockState().getValue(FortuneBlock.FACING);
+        pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-facing.toYRot()));
         pose.scale(.62F, .62F, .62F);
-        Minecraft.getInstance()
-            .getItemRenderer()
-            .renderStatic(
-                FortuneItem.stack(r),
-                ItemDisplayContext.FIXED,
-                light,
-                overlay,
-                pose,
-                buffers,
-                chest.getLevel(),
-                0);
-        // Thin physical gold frame: ordinary depth-tested geometry, never vanilla glowing outline.
-        VertexConsumer v = buffers.getBuffer(RenderType.lines());
-        var matrix = pose.last().pose();
-        var normal = pose.last().normal();
-        float[][] points = {{-.51F, -.51F}, {.51F, -.51F}, {.51F, .51F}, {-.51F, .51F}};
-        for (int k = 0; k < 4; k++) {
-          float[] a = points[k], b = points[(k + 1) % 4];
-          float nx = b[0] - a[0], ny = b[1] - a[1];
-          v.vertex(matrix, a[0], a[1], .015F)
-              .color(224, 185, 88, 255)
-              .normal(normal, nx, ny, 0)
-              .endVertex();
-          v.vertex(matrix, b[0], b[1], .015F)
-              .color(224, 185, 88, 255)
-              .normal(normal, nx, ny, 0)
-              .endVertex();
-        }
+        var mc = Minecraft.getInstance();
+        TextureAtlasSprite paper =
+            mc.getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
+                .apply(new ResourceLocation("dailyfortunes", "item/fortune_slip"));
+        TextureAtlasSprite outline =
+            mc.getModelManager()
+                .getModel(new ResourceLocation("dailyfortunes", "item/fortune_slip_outline"))
+                .getParticleIcon();
+        paperQuad(pose, buffers, outline, .001F, 15728880, overlay);
+        paperQuad(pose, buffers, paper, 0, light, overlay);
         pose.popPose();
       } catch (Exception ignored) {
       }
@@ -357,6 +407,33 @@ public final class FortuneClient {
     public int getViewDistance() {
       return 32;
     }
+  }
+
+  private static void paperQuad(
+      PoseStack pose,
+      MultiBufferSource buffers,
+      TextureAtlasSprite sprite,
+      float z,
+      int light,
+      int overlay) {
+    VertexConsumer v = buffers.getBuffer(RenderType.entityCutoutNoCull(InventoryMenu.BLOCK_ATLAS));
+    var matrix = pose.last().pose();
+    var normal = pose.last().normal();
+    float[][] positions = {{-.5F, -.5F}, {.5F, -.5F}, {.5F, .5F}, {-.5F, .5F}};
+    float[][] uv = {
+      {sprite.getU0(), sprite.getV1()},
+      {sprite.getU1(), sprite.getV1()},
+      {sprite.getU1(), sprite.getV0()},
+      {sprite.getU0(), sprite.getV0()}
+    };
+    for (int i = 0; i < 4; i++)
+      v.vertex(matrix, positions[i][0], positions[i][1], z)
+          .color(255, 255, 255, 255)
+          .uv(uv[i][0], uv[i][1])
+          .overlayCoords(overlay)
+          .uv2(light)
+          .normal(normal, 0, 0, 1)
+          .endVertex();
   }
 
   @Mod.EventBusSubscriber(modid = DailyFortunes.ID, value = Dist.CLIENT)
@@ -405,12 +482,21 @@ public final class FortuneClient {
         if (chest.display.isBlank()) continue;
         Vec3 mid = Vec3.atCenterOf(pos).add(0, 1.55, 0);
         if (mid.distanceToSqr(eye) > 49) continue;
-        var intersection =
-            new AABB(mid.x - .36, mid.y - .36, mid.z - .36, mid.x + .36, mid.y + .36, mid.z + .36)
-                .clip(eye, end);
-        if (intersection.isPresent() && eye.distanceToSqr(intersection.get()) < nearest) {
+        Direction facing = chest.getBlockState().getValue(FortuneBlock.FACING);
+        Vec3 normal = Vec3.atLowerCornerOf(facing.getNormal());
+        Vec3 ray = end.subtract(eye);
+        double denominator = ray.dot(normal);
+        if (Math.abs(denominator) < .000001) continue;
+        double t = mid.subtract(eye).dot(normal) / denominator;
+        if (t < 0 || t > 1) continue;
+        Vec3 point = eye.add(ray.scale(t));
+        double distance = eye.distanceToSqr(point);
+        Vec3 local = point.subtract(mid);
+        Vec3 right = new Vec3(normal.z, 0, -normal.x);
+        double u = .5 + local.dot(right) / .62, v = .5 - local.y / .62;
+        if (distance < nearest && SlipShape.opaque(u, v)) {
           target = chest;
-          nearest = eye.distanceToSqr(intersection.get());
+          nearest = distance;
         }
       }
       if (target == null) {

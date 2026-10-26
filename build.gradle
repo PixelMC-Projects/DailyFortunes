@@ -4,7 +4,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.github.johnrengelman.shadow'
-version='0.1.0'
+version='0.1.1'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-forge-1.20.1' }
 java { toolchain { languageVersion=JavaLanguageVersion.of(17) } }
@@ -43,6 +43,7 @@ minecraft.runs {
   parent minecraft.runs.client
   client true
   workingDirectory project.file('run-visual')
+  property 'dailyfortunes.benchmark',project.hasProperty('benchmark')?'true':'false'
   mods { dailyfortunes { source sourceSets.visual } }
   args '--username','FortuneTester','--width','1280','--height','800'
  }
@@ -58,3 +59,6 @@ tasks.register('packagedStorageChecks',JavaExec) {
  systemProperty 'dailyfortunes.packaged','true'
 }
 tasks.named('check') { dependsOn 'packagedStorageChecks' }
+
+tasks.register("worldStorageChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.WorldStorageChecks" }
+tasks.named("check") { dependsOn "worldStorageChecks" }

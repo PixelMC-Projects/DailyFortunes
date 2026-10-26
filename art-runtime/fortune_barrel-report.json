@@ -1,0 +1,478 @@
+{
+  "model": "fortune_barrel",
+  "masterSha256": "41d2e4a68d2cc7c0f58ffc4ff60902a29b76fa31dac0e76fffa13e4e3bd9f9b6",
+  "beforeElements": 1292,
+  "afterElements": 301,
+  "beforeQuads": 7224,
+  "afterQuads": 562,
+  "reductionPercent": 92.22,
+  "hiddenFacesRemoved": 16,
+  "coplanarQuadsSaved": 114,
+  "thinSideQuadsSaved": 0,
+  "atlas": [
+    1024,
+    2048
+  ],
+  "operations": [
+    {
+      "operation": "baked-floor-card",
+      "sourceElements": 17,
+      "faces": 2
+    },
+    {
+      "operation": "baked-lower-tassel-card",
+      "sourceElements": 10,
+      "faces": 2
+    },
+    {
+      "operation": "baked-stick-0",
+      "sourceElements": 10,
+      "faces": 6
+    },
+    {
+      "operation": "baked-stick-1",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-stick-2",
+      "sourceElements": 12,
+      "faces": 6
+    },
+    {
+      "operation": "baked-stick-3",
+      "sourceElements": 10,
+      "faces": 6
+    },
+    {
+      "operation": "baked-stick-4",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-stick-5",
+      "sourceElements": 12,
+      "faces": 6
+    },
+    {
+      "operation": "baked-stick-6",
+      "sourceElements": 10,
+      "faces": 6
+    },
+    {
+      "operation": "alpha-twigs-0-2",
+      "sourceElements": 43,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-1-2",
+      "sourceElements": 42,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-2-2",
+      "sourceElements": 48,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-3-2",
+      "sourceElements": 81,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-4-2",
+      "sourceElements": 42,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-5-2",
+      "sourceElements": 83,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-6-2",
+      "sourceElements": 39,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-7-2",
+      "sourceElements": 80,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-7-1",
+      "sourceElements": 76,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-7-0",
+      "sourceElements": 19,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-0-1",
+      "sourceElements": 5,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-6-0",
+      "sourceElements": 4,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-3-1",
+      "sourceElements": 48,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-2-1",
+      "sourceElements": 16,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-5-1",
+      "sourceElements": 77,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-5-0",
+      "sourceElements": 5,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-4-1",
+      "sourceElements": 1,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-6-1",
+      "sourceElements": 3,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-4-0",
+      "sourceElements": 6,
+      "faces": 2
+    },
+    {
+      "operation": "baked-上箍 01",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 02",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 03",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 04",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 05",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 06",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 07",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 08",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 09",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 10",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 11",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 12",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 13",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 14",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 15",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-上箍 16",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 01",
+      "sourceElements": 4,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 02",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 03",
+      "sourceElements": 4,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 04",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 05",
+      "sourceElements": 4,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 06",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 07",
+      "sourceElements": 4,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 08",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 09",
+      "sourceElements": 4,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 10",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 11",
+      "sourceElements": 4,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 12",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 13",
+      "sourceElements": 4,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 14",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 15",
+      "sourceElements": 4,
+      "faces": 6
+    },
+    {
+      "operation": "baked-下箍 16",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 01",
+      "sourceElements": 13,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 02",
+      "sourceElements": 12,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 03",
+      "sourceElements": 13,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 04",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 05",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 06",
+      "sourceElements": 13,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 07",
+      "sourceElements": 12,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 08",
+      "sourceElements": 13,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 09",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 10",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 11",
+      "sourceElements": 14,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 12",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 13",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 14",
+      "sourceElements": 13,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 15",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-分段顶木 16",
+      "sourceElements": 11,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 01",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 02",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 03",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 04",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 05",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 06",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 07",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 08",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 09",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 10",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 11",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 12",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 13",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 14",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 15",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-底部足圈 16",
+      "sourceElements": 2,
+      "faces": 6
+    }
+  ]
+}

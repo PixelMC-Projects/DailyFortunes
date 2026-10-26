@@ -1,0 +1,443 @@
+{
+  "model": "interpretation_shrine",
+  "masterSha256": "bffe8f9b00c114d5554804affd37186471cda867549b7f16b2a7aef04ba07e7e",
+  "beforeElements": 980,
+  "afterElements": 436,
+  "beforeQuads": 5604,
+  "afterQuads": 1183,
+  "reductionPercent": 78.89,
+  "hiddenFacesRemoved": 173,
+  "coplanarQuadsSaved": 241,
+  "thinSideQuadsSaved": 89,
+  "atlas": [
+    1024,
+    2048
+  ],
+  "operations": [
+    {
+      "operation": "profile-fruit-pair-0",
+      "sourceElements": 8,
+      "faces": 6
+    },
+    {
+      "operation": "profile-fruit-pair-1",
+      "sourceElements": 8,
+      "faces": 6
+    },
+    {
+      "operation": "profile-fruit-pair-2",
+      "sourceElements": 8,
+      "faces": 6
+    },
+    {
+      "operation": "profile-fruit-pair-3",
+      "sourceElements": 8,
+      "faces": 6
+    },
+    {
+      "operation": "profile-front-panel-ornament",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "profile-tray-ornament",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "profile-side-door-0",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "profile-side-door-1",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "profile-rear-door-hardware",
+      "sourceElements": 13,
+      "faces": 6
+    },
+    {
+      "operation": "alpha-twigs-7-3",
+      "sourceElements": 12,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-7-2",
+      "sourceElements": 11,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-7-1",
+      "sourceElements": 7,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-3-3",
+      "sourceElements": 1,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-3-2",
+      "sourceElements": 34,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-5-0",
+      "sourceElements": 15,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-5-1",
+      "sourceElements": 24,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-6-1",
+      "sourceElements": 45,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-6-0",
+      "sourceElements": 17,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-5-2",
+      "sourceElements": 8,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-4-2",
+      "sourceElements": 27,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-4-1",
+      "sourceElements": 14,
+      "faces": 2
+    },
+    {
+      "operation": "alpha-twigs-3-1",
+      "sourceElements": 14,
+      "faces": 2
+    },
+    {
+      "operation": "baked-roof-(6.7, 8.045, 14.34)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-roof-(5.4, 6.745, 13.86)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-roof-(4.1, 5.445, 13.38)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-roof-(2.8, 4.145, 12.9)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-roof-(1.5, 2.845, 12.74)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-roof-(8.0, 9.345, 14.34)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-roof-(9.3, 10.645, 13.86)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-roof-(10.6, 11.945, 13.38)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-roof-(11.9, 13.245, 12.9)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-roof-(13.2, 14.545, 12.74)",
+      "sourceElements": 17,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-rafter-array",
+      "sourceElements": 9,
+      "faces": 6
+    },
+    {
+      "operation": "baked-eave-ends",
+      "sourceElements": 16,
+      "faces": 2
+    },
+    {
+      "operation": "baked-eave-ends",
+      "sourceElements": 20,
+      "faces": 2
+    },
+    {
+      "operation": "baked-window-lattice",
+      "sourceElements": 6,
+      "faces": 2
+    },
+    {
+      "operation": "baked-window-lattice",
+      "sourceElements": 6,
+      "faces": 2
+    },
+    {
+      "operation": "baked-window-lattice",
+      "sourceElements": 6,
+      "faces": 2
+    },
+    {
+      "operation": "baked-relief-柱铜箍",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-柱铜箍",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-柱铜箍",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-柱铜箍",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-猫卧台",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-签形浮雕",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-口内护角",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-口内护角",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-侧板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-前立柱",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-盘侧",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-侧板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-前立柱",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-盘侧",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-榆木短足",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-榆木短足",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-榆木短足",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-榆木短足",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-前承梁",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-后承梁",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-左承梁",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-右承梁",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-猫耳",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-猫耳",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-卷尾横",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-左前爪",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "baked-relief-右前爪",
+      "sourceElements": 3,
+      "faces": 6
+    },
+    {
+      "operation": "merged-丝穗",
+      "sourceElements": 5,
+      "faces": 6
+    },
+    {
+      "operation": "merged-瓦下望板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "merged-瓦下望板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "merged-瓦下望板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "merged-山面封檐板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "merged-山面封檐板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "merged-山面封檐板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "merged-山面封檐板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "merged-山面封檐板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "merged-山面封檐板",
+      "sourceElements": 2,
+      "faces": 6
+    },
+    {
+      "operation": "merged-盘面",
+      "sourceElements": 5,
+      "faces": 6
+    }
+  ]
+}

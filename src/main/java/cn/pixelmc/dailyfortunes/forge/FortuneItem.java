@@ -41,14 +41,12 @@ public final class FortuneItem extends Item {
   public void initializeClient(
       java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions>
           consumer) {
-    if (kind == Kind.BARREL)
-      consumer.accept(
-          new net.minecraftforge.client.extensions.common.IClientItemExtensions() {
-            public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer
-                getCustomRenderer() {
-              return cn.pixelmc.dailyfortunes.client.BarrelRenderer.instance();
-            }
-          });
+    consumer.accept(
+        new net.minecraftforge.client.extensions.common.IClientItemExtensions() {
+          public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
+            return cn.pixelmc.dailyfortunes.client.BarrelRenderer.instance();
+          }
+        });
   }
 
   public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {

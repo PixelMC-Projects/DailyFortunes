@@ -46,7 +46,7 @@ public final class ServiceChecks {
               .getCodeSource()
               .getLocation()
               .getPath()
-              .endsWith("dailyfortunes-forge-1.20.1-0.1.0.jar"),
+              .endsWith("dailyfortunes-forge-1.20.1-0.1.1.jar"),
           "packaged backend is loaded first");
       check(
           Class.forName("cn.pixelmc.dailyfortunes.vendor.h2.Driver") != null,

@@ -47,6 +47,11 @@ public final class VisualProbe {
     if (m.getOverlay() != null || now - since < 2500) return;
     switch (phase) {
       case 1 -> {
+        if (Boolean.getBoolean("dailyfortunes.benchmark")) {
+          m.setScreen(new ModelBenchmark());
+          phase = 99;
+          return;
+        }
         try (var stream = VisualProbe.class.getResourceAsStream("/defaults/fortunes.json")) {
           var f =
               JsonParser.parseReader(
@@ -100,8 +105,29 @@ public final class VisualProbe {
       }
       case 4 -> {
         shot(m, "03-calendar");
-        System.out.println("DAILYFORTUNES_VISUAL_PASS");
+        m.setScreen(new ClientInspection(record));
         phase = 5;
+        since = now;
+      }
+      case 5 -> {
+        shot(m, "04-fixed-display");
+        JsonObject longRecord = record.deepCopy();
+        String text = s(longRecord.getAsJsonObject("snapshot"), "interpretation");
+        longRecord.getAsJsonObject("snapshot").addProperty("interpretation", text.repeat(8));
+        FortuneClient.receive("read", JSON.toJson(longRecord));
+        phase = 6;
+        since = now;
+      }
+      case 6 -> {
+        shot(m, "05-reading-scrollbar");
+        m.screen.mouseScrolled(300, 200, -8);
+        phase = 7;
+        since = now;
+      }
+      case 7 -> {
+        shot(m, "06-reading-scrolled");
+        System.out.println("DAILYFORTUNES_VISUAL_PASS");
+        phase = 8;
         m.stop();
       }
     }

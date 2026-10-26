@@ -89,21 +89,25 @@ public final class GameRuntime {
           !server.isDedicatedServer() && (mode.equals("auto") || mode.equals("local"));
       remote = !embedded && !mode.equals("database");
       if (embedded) {
+        WorldFortuneId identity =
+            server
+                .overworld()
+                .getDataStorage()
+                .computeIfAbsent(
+                    WorldFortuneId::load, WorldFortuneId::new, "dailyfortunes_identity");
+        Path local = dir.resolve("local-data/worlds").resolve(identity.id().toString());
         backend =
             new FortuneBackend(
                 "jdbc:h2:file:"
-                    + dir.resolve("local-data/fortunes")
-                        .toAbsolutePath()
-                        .toString()
-                        .replace('\\', '/')
+                    + local.resolve("fortunes").toAbsolutePath().toString().replace('\\', '/')
                     + ";MODE=MySQL;NON_KEYWORDS=DAY;DATABASE_TO_LOWER=TRUE;DB_CLOSE_ON_EXIT=FALSE",
                 "sa",
                 "",
-                dir);
+                local);
       } else if (remote) {
         Class.forName("com.pixelmc.pixelmcmanager.api.ManagerBridgeApi")
             .getMethod("register", String.class, String.class, String.class, String.class)
-            .invoke(null, "dailyfortunes", "DailyFortunes", "0.1.0", "每日抽签,玩家签历,永久收藏,解签龛");
+            .invoke(null, "dailyfortunes", "DailyFortunes", "0.1.1", "每日抽签,玩家签历,永久收藏,解签龛");
       } else {
         JsonObject db = config.getAsJsonObject("database");
         backend = new FortuneBackend(s(db, "url"), s(db, "user"), s(db, "password"), dir);

@@ -1,6 +1,6 @@
 .gradle/
 build/
-run*/
+/run*/
 logs/
 libs/
 releases/
@@ -9,3 +9,8 @@ releases/
 .local*/
 .idea/
 *.iml
+
+src/visual/resources/assets/dailyfortunes/models/item/baseline_*.json
+src/visual/resources/assets/dailyfortunes/textures/benchmark/
+tools/__pycache__/
+tools/runtime_profiles/__pycache__/
