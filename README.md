@@ -9,9 +9,9 @@
 
 ## 安装与使用
 
-**Minecraft 1.20.1 / Forge 47.3+，客户端和服务端都需要安装。** 当前为首次客户端验收版本，尚未发布发行版。
+**Minecraft 1.20.1 / Forge 47.3+，客户端和服务端都需要安装。** 当前发行版为 [0.1.2](https://github.com/PixelMC-Projects/DailyFortunes/releases/tag/v0.1.2)。
 
-当前模型采用轻度有损派生版本：细小凸饰转入贴图，保留主体轮廓与主要植物。三个模型合计 2,355 个四边面，较上一版减少 23.4%；原始美术蓝本不改。本轮客户端实测待用户完成，不创建新发行版。
+当前模型采用轻度有损派生版本：细小凸饰转入贴图，保留主体轮廓与主要植物。三个模型合计 2,355 个四边面，较原始蓝本减少 85.9%；原始美术蓝本不改。
 
 单人游戏只需将 JAR 放入 `mods`。默认使用内置本地数据库，数据保存在游戏目录的 `config/dailyfortunes/local-data/worlds/<存档ID>`，无需另装数据库。进入世界后等待约 10 秒加载签历。
 
@@ -33,7 +33,7 @@ Draw one fortune each day, interpret it at a wooden shrine, and keep it permanen
 
 Install on **both sides with Minecraft 1.20.1 / Forge 47.3+**. Singleplayer uses an embedded database automatically. For multiplayer web management, run PixelMC Manager with a separate MariaDB database and account for DailyFortunes, enable `fortunesEnabled`, configure `fortunesDatabase` and the game bridge. Without Manager, select `mode: database` in `config/dailyfortunes/server.json`.
 
-The current lightly lossy runtime models bake small raised details into textures while keeping the main shapes and foliage. Their combined 2,355 quads are 23.4% fewer than the previous version. Original art masters remain unchanged; this revision awaits the user's client playtest and has no new Release.
+Download [0.1.2](https://github.com/PixelMC-Projects/DailyFortunes/releases/tag/v0.1.2) from Releases. Its lightly lossy runtime models bake small raised details into textures while keeping the main shapes and foliage: 2,355 combined quads, 85.9% fewer than the unchanged original art masters.
 
 Use `/df recover yyyy-MM-dd` to recover an unarchived result. Opening the archive stores your interpreted slips; left-click to read, right-click to display. Server collections survive world changes; singleplayer saves have separate quotas and collections. Include this database separately in offsite backups.
 
