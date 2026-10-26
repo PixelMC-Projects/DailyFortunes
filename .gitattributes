@@ -5,3 +5,5 @@
 *.md text eol=lf
 gradlew text eol=lf
 *.bat text eol=crlf
+ops/**/*.sh text eol=lf
+ops/**/*.py text eol=lf
