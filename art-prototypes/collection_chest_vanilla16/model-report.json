@@ -1,0 +1,17 @@
+{
+  "status": "art study, not integrated or installed",
+  "elements": 25,
+  "quads": 91,
+  "triangles": 182,
+  "faceBudget": 128,
+  "texture": [
+    64,
+    64
+  ],
+  "texelsPerBlock": 16,
+  "previousRuntimeQuads": 402,
+  "reductionPercent": 77.4,
+  "styleReference": "fortune_barrel_vanilla16 revision 2, ec8209d",
+  "runtimeAssetsPreserved": true,
+  "performance": "No measured FPS claim."
+}

@@ -1,0 +1,2298 @@
+{
+  "meta": {
+    "format_version": "4.10",
+    "model_format": "java_block",
+    "box_uv": false
+  },
+  "name": "藏签匣 · 原版像素试作",
+  "model_identifier": "collection_chest_vanilla16",
+  "resolution": {
+    "width": 64,
+    "height": 64
+  },
+  "java_block_version": "1.9",
+  "ambientocclusion": true,
+  "elements": [
+    {
+      "name": "底座",
+      "type": "cube",
+      "uuid": "b211fde8-d895-51f2-a3c3-54807036b7d6",
+      "from": [
+        1,
+        0,
+        2
+      ],
+      "to": [
+        15,
+        1,
+        14
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": 0,
+          "uv": [
+            1,
+            46,
+            15,
+            47
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            1,
+            46,
+            15,
+            47
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            17,
+            46,
+            29,
+            47
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            17,
+            46,
+            29,
+            47
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            19,
+            1,
+            33,
+            13
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            19,
+            1,
+            33,
+            13
+          ]
+        }
+      }
+    },
+    {
+      "name": "柜体",
+      "type": "cube",
+      "uuid": "af310d41-5ab0-5713-bbd4-772dc8f902ae",
+      "from": [
+        2,
+        1,
+        3
+      ],
+      "to": [
+        14,
+        9,
+        13
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": 0,
+          "uv": [
+            3,
+            24,
+            15,
+            32
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            3,
+            24,
+            15,
+            32
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            4,
+            24,
+            14,
+            32
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            4,
+            24,
+            14,
+            32
+          ]
+        },
+        "up": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "左上抽屉",
+      "type": "cube",
+      "uuid": "3f428641-5109-56f8-8b43-483f027af3e7",
+      "from": [
+        3,
+        5,
+        13
+      ],
+      "to": [
+        7,
+        8,
+        13.25
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            25,
+            35,
+            29,
+            38
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            31,
+            35,
+            31.25,
+            38
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            31,
+            35,
+            31.25,
+            38
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            31,
+            46,
+            35,
+            46.25
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            31,
+            46,
+            35,
+            46.25
+          ]
+        }
+      }
+    },
+    {
+      "name": "右上抽屉",
+      "type": "cube",
+      "uuid": "dcb451fa-a31b-559f-8497-1a27417d6e99",
+      "from": [
+        9,
+        5,
+        13
+      ],
+      "to": [
+        13,
+        8,
+        13.25
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            25,
+            35,
+            29,
+            38
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            31,
+            35,
+            31.25,
+            38
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            31,
+            35,
+            31.25,
+            38
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            31,
+            46,
+            35,
+            46.25
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            31,
+            46,
+            35,
+            46.25
+          ]
+        }
+      }
+    },
+    {
+      "name": "下层抽屉",
+      "type": "cube",
+      "uuid": "f1500bab-d3c9-5ea7-a8b7-c5ad3c1a9666",
+      "from": [
+        3,
+        1.5,
+        13
+      ],
+      "to": [
+        13,
+        4.5,
+        13.25
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            34,
+            35,
+            44,
+            38.0
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            31,
+            35,
+            31.25,
+            38.0
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            31,
+            35,
+            31.25,
+            38.0
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            37,
+            46,
+            47,
+            46.25
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            37,
+            46,
+            47,
+            46.25
+          ]
+        }
+      }
+    },
+    {
+      "name": "左铜扣",
+      "type": "cube",
+      "uuid": "bce35188-7c2a-589b-b96b-191c4e1a71ba",
+      "from": [
+        4.5,
+        6,
+        13.25
+      ],
+      "to": [
+        5.5,
+        7,
+        13.75
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            50.0,
+            47
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            49.5,
+            47
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            49.5,
+            47
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            50.0,
+            46.5
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            50.0,
+            46.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "右铜扣",
+      "type": "cube",
+      "uuid": "3c57ae26-5147-5bb8-9d1b-ab8665ca44bf",
+      "from": [
+        10.5,
+        6,
+        13.25
+      ],
+      "to": [
+        11.5,
+        7,
+        13.75
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            50.0,
+            47
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            49.5,
+            47
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            49.5,
+            47
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            50.0,
+            46.5
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            50.0,
+            46.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "下层铜把手",
+      "type": "cube",
+      "uuid": "b60f3a40-abe7-5b47-bbf0-464736e9e259",
+      "from": [
+        6.5,
+        2.5,
+        13.25
+      ],
+      "to": [
+        9.5,
+        3.5,
+        13.75
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            52,
+            46,
+            55.0,
+            47.0
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            49.5,
+            47.0
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            49,
+            46,
+            49.5,
+            47.0
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            52,
+            46,
+            55.0,
+            46.5
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            52,
+            46,
+            55.0,
+            46.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "匣盖",
+      "type": "cube",
+      "uuid": "88ee3eae-8fa2-560b-86e6-e38e85f4869b",
+      "from": [
+        1,
+        9,
+        2
+      ],
+      "to": [
+        15,
+        10,
+        14
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": 0,
+          "uv": [
+            1,
+            46,
+            15,
+            47
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            1,
+            46,
+            15,
+            47
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            17,
+            46,
+            29,
+            47
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            17,
+            46,
+            29,
+            47
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            35,
+            1,
+            49,
+            13
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            35,
+            1,
+            49,
+            13
+          ]
+        }
+      }
+    },
+    {
+      "name": "盖框 north",
+      "type": "cube",
+      "uuid": "5037eddc-7ef7-5fb3-8aeb-63cc360e053c",
+      "from": [
+        1,
+        10,
+        2
+      ],
+      "to": [
+        15,
+        10.5,
+        3
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": 0,
+          "uv": [
+            1,
+            49,
+            15,
+            49.5
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            1,
+            49,
+            15,
+            49.5
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            17,
+            49,
+            18,
+            49.5
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            17,
+            49,
+            18,
+            49.5
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            20,
+            49,
+            34,
+            50
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "盖框 south",
+      "type": "cube",
+      "uuid": "be6f543c-ac71-50f0-8f19-fb605b1426d4",
+      "from": [
+        1,
+        10,
+        13
+      ],
+      "to": [
+        15,
+        10.5,
+        14
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": 0,
+          "uv": [
+            1,
+            49,
+            15,
+            49.5
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            1,
+            49,
+            15,
+            49.5
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            17,
+            49,
+            18,
+            49.5
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            17,
+            49,
+            18,
+            49.5
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            20,
+            49,
+            34,
+            50
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "盖框 west",
+      "type": "cube",
+      "uuid": "eb214fa3-13bc-562a-814b-e917ced25df5",
+      "from": [
+        1,
+        10,
+        3
+      ],
+      "to": [
+        2,
+        10.5,
+        13
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            36,
+            49,
+            46,
+            49.5
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            36,
+            49,
+            46,
+            49.5
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            51,
+            1,
+            52,
+            11
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "盖框 east",
+      "type": "cube",
+      "uuid": "92272f12-bb63-59c9-84fc-da50a463324c",
+      "from": [
+        14,
+        10,
+        3
+      ],
+      "to": [
+        15,
+        10.5,
+        13
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            36,
+            49,
+            46,
+            49.5
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            36,
+            49,
+            46,
+            49.5
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            51,
+            1,
+            52,
+            11
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "护条 south",
+      "type": "cube",
+      "uuid": "7c211790-79d6-58b6-85d2-8dbd1734e197",
+      "from": [
+        1.75,
+        1,
+        13
+      ],
+      "to": [
+        14.25,
+        2,
+        13.3
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            48,
+            49,
+            60.5,
+            50
+          ]
+        },
+        "east": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "west": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            1,
+            52,
+            13.5,
+            52.3
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            1,
+            52,
+            13.5,
+            52.3
+          ]
+        }
+      }
+    },
+    {
+      "name": "护条 north",
+      "type": "cube",
+      "uuid": "26fecda1-6b04-5b21-aed4-bcc966b8b3f7",
+      "from": [
+        1.75,
+        1,
+        2.75
+      ],
+      "to": [
+        14.25,
+        2,
+        3
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": 0,
+          "uv": [
+            48,
+            49,
+            60.5,
+            50
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "west": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            1,
+            52,
+            13.5,
+            52.25
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            1,
+            52,
+            13.5,
+            52.25
+          ]
+        }
+      }
+    },
+    {
+      "name": "护条 west 上下缘",
+      "type": "cube",
+      "uuid": "f49a5366-d7cd-5878-bdc8-38a86935c662",
+      "from": [
+        1.75,
+        1,
+        3
+      ],
+      "to": [
+        2,
+        2,
+        13
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "west": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            54,
+            1,
+            54.25,
+            11
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            54,
+            1,
+            54.25,
+            11
+          ]
+        }
+      }
+    },
+    {
+      "name": "护条 west 外缘",
+      "type": "cube",
+      "uuid": "2bb3ab26-769b-50f4-8275-9578ce238465",
+      "from": [
+        1.75,
+        1,
+        2.75
+      ],
+      "to": [
+        1.75,
+        2,
+        13.3
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            16,
+            52,
+            26.55,
+            53
+          ]
+        },
+        "up": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "护条 east 上下缘",
+      "type": "cube",
+      "uuid": "f596a4b6-875b-5c88-8491-38f8d240b755",
+      "from": [
+        14,
+        1,
+        3
+      ],
+      "to": [
+        14.25,
+        2,
+        13
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "west": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            54,
+            1,
+            54.25,
+            11
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            54,
+            1,
+            54.25,
+            11
+          ]
+        }
+      }
+    },
+    {
+      "name": "护条 east 外缘",
+      "type": "cube",
+      "uuid": "f25e759a-982b-50fe-a672-a8f078ac7ee5",
+      "from": [
+        14.25,
+        1,
+        2.75
+      ],
+      "to": [
+        14.25,
+        2,
+        13.3
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            16,
+            52,
+            26.55,
+            53
+          ]
+        },
+        "west": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "up": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "红绳结",
+      "type": "cube",
+      "uuid": "5fad13f1-7ef7-5577-98cd-33384033d7d7",
+      "from": [
+        14,
+        6,
+        7
+      ],
+      "to": [
+        15,
+        8,
+        9
+      ],
+      "origin": [
+        14.5,
+        7,
+        8
+      ],
+      "rotation": [
+        45,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": 0,
+          "uv": [
+            49,
+            35,
+            50,
+            37
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            49,
+            35,
+            50,
+            37
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            52,
+            35,
+            54,
+            37
+          ]
+        },
+        "west": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            49,
+            35,
+            50,
+            37
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            49,
+            35,
+            50,
+            37
+          ]
+        }
+      }
+    },
+    {
+      "name": "绳尾",
+      "type": "cube",
+      "uuid": "4e9b0ef0-9d57-508d-9bb7-f949bc27d233",
+      "from": [
+        14,
+        3,
+        7.5
+      ],
+      "to": [
+        15,
+        6,
+        8.5
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": 0,
+          "uv": [
+            46,
+            35,
+            47,
+            38
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            46,
+            35,
+            47,
+            38
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            46,
+            35,
+            47.0,
+            38
+          ]
+        },
+        "west": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "up": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            29,
+            52,
+            30,
+            53.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "右侧叶片",
+      "type": "cube",
+      "uuid": "a0c0c9c7-f1e5-5362-8208-093bf835b0bc",
+      "from": [
+        15.05,
+        4,
+        3
+      ],
+      "to": [
+        15.05,
+        13,
+        9
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            1,
+            35,
+            7,
+            44
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            7,
+            35,
+            1,
+            44
+          ]
+        },
+        "up": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "后侧叶片",
+      "type": "cube",
+      "uuid": "6feccd4e-e57f-5632-b2d0-4cbf5432d662",
+      "from": [
+        10,
+        3,
+        1.95
+      ],
+      "to": [
+        16,
+        13,
+        1.95
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": 0,
+          "uv": [
+            63,
+            1,
+            57,
+            11
+          ]
+        },
+        "south": {
+          "texture": 0,
+          "uv": [
+            57,
+            1,
+            63,
+            11
+          ]
+        },
+        "east": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "west": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "up": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "盖沿叶片",
+      "type": "cube",
+      "uuid": "934d0090-fc8e-5a82-b2ce-82b62ab8fe24",
+      "from": [
+        10,
+        10.55,
+        1
+      ],
+      "to": [
+        16,
+        10.55,
+        7
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "west": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "up": {
+          "texture": 0,
+          "uv": [
+            17,
+            35,
+            23,
+            41
+          ]
+        },
+        "down": {
+          "texture": 0,
+          "uv": [
+            17,
+            41,
+            23,
+            35
+          ]
+        }
+      }
+    },
+    {
+      "name": "左侧叶片",
+      "type": "cube",
+      "uuid": "07ca62c3-61c3-5b40-9661-4665ace9a256",
+      "from": [
+        0.95,
+        2,
+        3
+      ],
+      "to": [
+        0.95,
+        10,
+        9
+      ],
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "shade": true,
+      "rescale": false,
+      "faces": {
+        "north": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "south": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": 0,
+          "uv": [
+            9,
+            35,
+            15,
+            43
+          ]
+        },
+        "west": {
+          "texture": 0,
+          "uv": [
+            15,
+            35,
+            9,
+            43
+          ]
+        },
+        "up": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "down": {
+          "texture": null,
+          "uv": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    }
+  ],
+  "outliner": [
+    {
+      "name": "木作 / Timber",
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "uuid": "7c2d6f1c-cf51-5f59-8af1-f821c6cf7b80",
+      "export": true,
+      "isOpen": false,
+      "children": [
+        "b211fde8-d895-51f2-a3c3-54807036b7d6",
+        "af310d41-5ab0-5713-bbd4-772dc8f902ae"
+      ]
+    },
+    {
+      "name": "抽屉 / Drawers",
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "uuid": "a994cbd6-d3ee-544b-962e-198dcb6e1d00",
+      "export": true,
+      "isOpen": false,
+      "children": [
+        "3f428641-5109-56f8-8b43-483f027af3e7",
+        "dcb451fa-a31b-559f-8497-1a27417d6e99",
+        "f1500bab-d3c9-5ea7-a8b7-c5ad3c1a9666"
+      ]
+    },
+    {
+      "name": "铜件 / Hardware",
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "uuid": "9b8ebafc-697a-53a1-a126-2dc593b3a7b2",
+      "export": true,
+      "isOpen": false,
+      "children": [
+        "bce35188-7c2a-589b-b96b-191c4e1a71ba",
+        "3c57ae26-5147-5bb8-9d1b-ab8665ca44bf",
+        "b60f3a40-abe7-5b47-bbf0-464736e9e259",
+        "7c211790-79d6-58b6-85d2-8dbd1734e197",
+        "26fecda1-6b04-5b21-aed4-bcc966b8b3f7",
+        "f49a5366-d7cd-5878-bdc8-38a86935c662",
+        "2bb3ab26-769b-50f4-8275-9578ce238465",
+        "f596a4b6-875b-5c88-8491-38f8d240b755",
+        "f25e759a-982b-50fe-a672-a8f078ac7ee5"
+      ]
+    },
+    {
+      "name": "匣盖 / Lid",
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "uuid": "46b17b7e-f273-57e1-8e43-18f3cd0d36e1",
+      "export": true,
+      "isOpen": false,
+      "children": [
+        "88ee3eae-8fa2-560b-86e6-e38e85f4869b",
+        "5037eddc-7ef7-5fb3-8aeb-63cc360e053c",
+        "be6f543c-ac71-50f0-8f19-fb605b1426d4",
+        "eb214fa3-13bc-562a-814b-e917ced25df5",
+        "92272f12-bb63-59c9-84fc-da50a463324c"
+      ]
+    },
+    {
+      "name": "红绳 / Cord",
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "uuid": "7117c6eb-0a40-5504-9b8b-b69494c01b84",
+      "export": true,
+      "isOpen": false,
+      "children": [
+        "5fad13f1-7ef7-5577-98cd-33384033d7d7",
+        "4e9b0ef0-9d57-508d-9bb7-f949bc27d233"
+      ]
+    },
+    {
+      "name": "叶片 / Foliage",
+      "origin": [
+        8,
+        0,
+        8
+      ],
+      "uuid": "3fa1b0d1-0c48-50e1-8942-495efe295b6b",
+      "export": true,
+      "isOpen": false,
+      "children": [
+        "a0c0c9c7-f1e5-5362-8208-093bf835b0bc",
+        "6feccd4e-e57f-5632-b2d0-4cbf5432d662",
+        "934d0090-fc8e-5a82-b2ce-82b62ab8fe24",
+        "07ca62c3-61c3-5b40-9661-4665ace9a256"
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "collection_chest_vanilla16.png",
+      "id": "0",
+      "uuid": "bfa0a768-dcfe-5b1a-a06f-e52c82de8dc6",
+      "mode": "bitmap",
+      "saved": true,
+      "width": 64,
+      "height": 64,
+      "uv_width": 64,
+      "uv_height": 64,
+      "source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADyElEQVR4nO2aMWgUQRSG3w5XiZKkiBpNCAEJhihCigga7UTSBGyCKbQStY6NBK0EsTG1ASstTiwU0oiFTTwVU6QxIRKEIJGcGiEJiiAWK+8ub/NunJ2d3dlL9m72g2NnZ+bd7P/2ze7O7vMAAKZvD/mwRXntN/T1HqBdWFz6Bh3te0DXfu3BnIflmcnh4H821n9Ca9s+MNk/O/7CszkOsh+auOKX7j6slI+NjfjzxelKmTN2/4zf3bUX7o1WbQp80KRMXR/w+cHGBR2HDrGxn/hxGMgJG8vfQecETsFkgJ7eTlhe+gK7je1x0Nk/2nEQbj6tRqugRh6eu0m9joOL/1j+Cp9XflV+RhHQDBRvvPbQCQBV8bgPPAJ0ZCH8Edvwxy0XX+MA+SKEV93dIO3jQOEU/ucHjwBuyRlI008BFIzg3KcIoDqtA2xua2liexwouEp17iP0DGB8DWhkcL7jj0Tj2adboBMO4KAj6PbXdA4obT0C45ae/qKeAlO9CKoeZeW6qP20nKATz2+BqUbAyJ2SZ2NrY0+LoSQUIEVsRKRhnwQBjiPAcQQ4jjBdhzcrImvvA3YaAY4jGul9QD0QWXsfsNMIcByR9fcB9UaA4whwHAGOI8BxBDiOAMcR4DgCHEek8RqKEiQaES8sc0Imql3Hh8cXa5Iwjl96EmSU0AtNuU8YZDt3YcgfeF76r1y+NeqXF1aB9qMoQJ1RCcO69bVNICe0tbfE+r+/z6qrUxRO9Vju6D8U9ONO0eHRl1KePMDPclR7VITIKTiY2yOvNeSVqCo/6NTp3mBZ3jm/3Xd+dT1U3OX3C9EfRrrZ11PKnOBEtcsOwu9u/Bs8CZbholV95OX42zdL27arf2pEPjrZ75NYLJuKV14D6POxfCbD2ulDIzlIdhQ6ApOoVBdNjA66CMt9wiBbLtoGTyWSRCDydAhrV+XgkAMgwxTkirBQj2oPy8HJOgUq0Bl8Ofupsi8LiGpvVLy07gKNiqAMCgxblbhmOdNWD0LFJnaCl0aSc1x7uvXJdmH1UeNvLk76LX3jQZn6Up3WATNssLgOUGFij8j/oavX/d+J4XNagVFOEDbZFWibxB7PtMourF43PgnErSzWKAJgK60cEkB5ODwtHdPVcTvY3wWzCytae96H5/nHGdt0PNVYiJdUvIrWnv1BOa4DEMrzr8d4cjs5QZikkoWBtjwljXs2Ljy9zXTspOPVRAAknAKmIagKvbQWMmng2UwBkxCU66++eheUs+AEkXQKJAlB7E+isyA+JycnJycnJycHHOYfHIfAT5245IoAAAAASUVORK5CYII="
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        25,
+        35,
+        0
+      ],
+      "translation": [
+        0,
+        -1,
+        0
+      ],
+      "scale": [
+        0.76,
+        0.76,
+        0.76
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        1,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -25,
+        0
+      ],
+      "translation": [
+        1,
+        1,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    }
+  }
+}
