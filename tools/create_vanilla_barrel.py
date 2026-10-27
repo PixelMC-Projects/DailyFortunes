@@ -9,7 +9,6 @@ import base64
 import hashlib
 import io
 import json
-import math
 import uuid
 from pathlib import Path
 
@@ -33,17 +32,18 @@ def rgba(color):
     return tuple(bytes.fromhex(color.lstrip("#"))) + (255,)
 
 
-# Warm timber, muted jade binding and a small cinnabar accent. No random noise.
-WOOD = [rgba(s) for s in ("806440", "927348", "a18150", "ad8d59", "b69765", "c0a372")]
-GREEN = [rgba(s) for s in ("4c6444", "5c754c", "6d8655", "7e9560")]
-JADE = [rgba(s) for s in ("4d6257", "61776a", "788775")]
-RED = [rgba(s) for s in ("773d34", "955144", "ab6652")]
-BAMBOO = [rgba(s) for s in ("ae925b", "c0a46a", "d0b77c")]
+# Warm honey timber, green iron hoops, fresh foliage and cinnabar accents.
+# Saturation is intentional; texture changes still use connected pixel clusters.
+WOOD = [rgba(s) for s in ("805429", "996832", "b27d3c", "c28e49", "d3a358", "dfb772")]
+GREEN = [rgba(s) for s in ("3d6c32", "598d3d", "78aa49", "a0c361")]
+JADE = [rgba(s) for s in ("2c594e", "3c7a64", "72a581")]
+RED = [rgba(s) for s in ("a2372b", "ce513c", "e77c56")]
+BAMBOO = [rgba(s) for s in ("c29a4e", "e0bd6d", "f1d78e")]
 
 
 def surface(material, width, height, variant=0):
     """Pixel-authored surfaces, with grouped marks rather than per-pixel noise."""
-    w, h = int(round(width)), int(round(height))
+    w, h = int(np.ceil(width)), int(np.ceil(height))
     assert w > 0 and h > 0
     im = Image.new("RGBA", (w, h), WOOD[3])
     d = ImageDraw.Draw(im)
@@ -63,42 +63,47 @@ def surface(material, width, height, variant=0):
                 d.line((0, h - 1, w - 1, h - 1), fill=WOOD[2])
             for x in range(3, w, 4):
                 d.line((x, 0, x, h - 1), fill=WOOD[2])
-        if material == "wall":
-            for y in (1, h - 2):
-                if 0 <= y < h:
-                    d.line((0, y, w - 1, y), fill=JADE[1])
-                    for x in (1, w - 2):
-                        if 0 <= x < w:
-                            d.point((x, y), fill=JADE[2])
         if material == "inside":
             a = np.array(im)
             a[:, :, :3] = (a[:, :, :3].astype(float) * .83).astype(np.uint8)
             im = Image.fromarray(a)
     elif material == "bamboo":
         d.rectangle((0, 0, w - 1, h - 1), fill=BAMBOO[1])
+        if w > 1:
+            d.line((0, 0, 0, h - 1), fill=BAMBOO[2])
         if h >= 5:
-            d.line((0, 0, w - 1, 0), fill=RED[1])
-            d.line((0, 1, w - 1, 1), fill=RED[0])
-            d.line((0, 3, w - 1, 3), fill=BAMBOO[2])
+            # Bamboo continues above the colored wrap, avoiding a match-head cap.
+            # The same two rows wrap all four sides of every flat fortune stick.
+            d.line((0, 2, w - 1, 2), fill=RED[1])
+            d.line((0, 3, w - 1, 3), fill=RED[0])
             # A single subdued joint, no tiny writing or decorative tally marks.
             d.line((0, h - 4, w - 1, h - 4), fill=BAMBOO[0])
     elif material == "bamboo_end":
-        d.rectangle((0, 0, w - 1, h - 1), fill=RED[1] if variant else BAMBOO[0])
+        d.rectangle((0, 0, w - 1, h - 1), fill=BAMBOO[2] if variant else BAMBOO[0])
+    elif material in ("metal", "metal_edge"):
+        d.rectangle((0, 0, w - 1, h - 1), fill=JADE[1 if material == "metal" else 0])
+        if material == "metal" and w >= 6:
+            for x in (2, w - 3):
+                d.point((x, 0), fill=JADE[2])
     elif material == "red":
         d.rectangle((0, 0, w - 1, h - 1), fill=RED[1])
         d.line((0, h - 1, w - 1, h - 1), fill=RED[0])
         if w > 1:
             d.point((0, 0), fill=RED[2])
     elif material == "leaves":
-        # Original small leaf-cluster pixel pattern, inspired by vanilla's leaves.
-        # The 16x density is geometric; we do not shrink a photo or borrow an asset.
-        pattern = (
-            "12232121", "23221232", "21303212", "12223231",
-            "23121322", "31232012", "12223231", "23121223",
+        # Original cutout cards with stepped edges and connected clusters.
+        # No solid leaf cubes, random noise, tiny veins or copied game textures.
+        patterns = (
+            ("000230", "002343", "023432", "002320", "022200",
+             "234320", "344230", "232200", "002330", "000220"),
+            ("023000", "234300", "343200", "023230", "002343",
+             "002432", "023220", "234300", "023000", "002000"),
+            ("000000", "023000", "234320", "343432", "023432", "002320"),
         )
+        pattern = patterns[variant % len(patterns)]
         for y in range(h):
             for x in range(w):
-                value = int(pattern[(y + variant) % 8][(x + 2 * variant) % 8])
+                value = int(pattern[y % len(pattern)][x % 6])
                 d.point((x, y), fill=(0, 0, 0, 0) if value == 0 else GREEN[value - 1])
     else:
         raise ValueError(material)
@@ -147,7 +152,7 @@ class Atlas:
 
 def make_model():
     atlas = Atlas()
-    elements, groups = [], {"木桶 / Timber": [], "叶簇 / Foliage": [], "红绳 / Cord": []}
+    elements, groups = [], {"木桶 / Timber": [], "铁箍 / Hoops": [], "叶片 / Foliage": [], "红绳 / Cord": []}
 
     def cube(name, lo, hi, faces, group="木桶 / Timber", rotation=None, origin=None):
         dx, dy, dz = [hi[i] - lo[i] for i in range(3)]
@@ -159,14 +164,23 @@ def make_model():
         for f, spec in faces.items():
             material, variant = spec if isinstance(spec, tuple) else (spec, 0)
             w, h = sizes[f]
-            assert abs(w - round(w)) < 1e-7 and abs(h - round(h)) < 1e-7, (name, f, sizes[f])
+            assert w > 0 and h > 0, (name, f, sizes[f])
             tile = atlas.add(surface(material, w, h, variant))
-            e["faces"][f] = {"texture": 0, "_tile": tile}
+            # Thin hoop ledges use fractional UVs at the same 16x density.
+            e["faces"][f] = {"texture": 0, "_tile": tile, "_uv_size": [w, h]}
         for f in sizes:
             if f not in e["faces"]:
                 e["faces"][f] = {"texture": None, "uv": [0, 0, 0, 0]}
         elements.append(e)
         groups.setdefault(group, []).append(e["uuid"])
+        return e
+
+    def card(name, lo, hi, faces, variant=0):
+        e = cube(name, lo, hi, {f: ("leaves", variant) for f in faces}, "叶片 / Foliage")
+        # Opposite faces must have identical opaque pixels in world space.
+        # Otherwise a plant's shape would change when viewed from behind.
+        reverse = next(f for f in faces if f in ("north", "west", "down"))
+        e["faces"][reverse]["_flip"] = "v" if reverse == "down" else "u"
         return e
 
     # Hollow square body. Coplanar contacts have no redundant cap faces.
@@ -185,13 +199,26 @@ def make_model():
     cube("右木沿 / Right rim", [12, 11, 4], [14, 12, 12],
          dict(up="endgrain", east="endgrain", west="inside", down="endgrain"))
 
-    # Three little angular leaf clumps. Nothing is a detailed botanical mesh.
-    cube("左上叶簇 / Upper leaves", [0, 12, 10], [4, 15, 14],
-         {f: ("leaves", i % 3) for i, f in enumerate(("north", "south", "west", "east", "up", "down"))}, "叶簇 / Foliage")
-    cube("垂落叶簇 / Hanging leaves", [0, 9, 11], [2, 12, 14],
-         {f: ("leaves", (i + 1) % 3) for i, f in enumerate(("north", "south", "west", "east", "down"))}, "叶簇 / Foliage")
-    cube("后侧叶簇 / Back leaves", [12, 12, 2], [15, 15, 6],
-         {f: ("leaves", (i + 2) % 3) for i, f in enumerate(("north", "south", "west", "east", "up", "down"))}, "叶簇 / Foliage")
+    # Raised square iron hoops, half a model unit proud of the timber.
+    # Outer corner faces are continuous; no duplicate coplanar corner faces.
+    for y, label in ((2, "下"), (9, "上")):
+        for z0, z1, side in ((13, 13.5, "south"), (2.5, 3, "north")):
+            cube(f"{label}箍 {side}", [2.5, y, z0], [13.5, y + 1, z1],
+                 {side: "metal", "up": "metal_edge", "down": "metal_edge"}, "铁箍 / Hoops")
+        for x0, x1, side in ((2.5, 3, "west"), (13, 13.5, "east")):
+            cube(f"{label}箍 {side} 上下缘", [x0, y, 3], [x1, y + 1, 13],
+                 dict(up="metal_edge", down="metal_edge"), "铁箍 / Hoops")
+            x = x0 if side == "west" else x1
+            cube(f"{label}箍 {side} 外缘", [x, y, 2.5], [x, y + 1, 13.5],
+                 {side: "metal"}, "铁箍 / Hoops")
+
+    # Five small double-sided sheets, staggered around two corners.
+    # Plant cards sit outside the hoops/wood; only their natural roots touch them.
+    card("左前叶片 / Front leaves", [0, 6, 14.05], [6, 16, 14.05], ("south", "north"))
+    card("左侧叶片 / Side leaves", [1.95, 7, 9], [1.95, 16, 15], ("east", "west"), 1)
+    card("沿口叶片 / Rim leaves", [0, 12.05, 10], [6, 12.05, 16], ("up", "down"), 2)
+    card("后侧叶片 / Back leaves", [10, 8, 1.95], [16, 16, 1.95], ("south", "north"), 1)
+    card("右侧叶片 / Right leaves", [14.05, 8, 1], [14.05, 16, 7], ("east", "west"))
 
     cube("红绳结 / Cinnabar knot", [7, 7, 13], [9, 9, 14],
          {f: "red" for f in ("south", "east", "west", "up", "down")}, "红绳 / Cord", [0, 0, 45], [8, 8, 13.5])
@@ -201,15 +228,15 @@ def make_model():
     # Seven independent cuboids with native Java-model rotations and their own pivots.
     rig = []
     for i, (x, z, top, axis, angle) in enumerate((
-        (8, 8, 21, "z", 0), (6.1, 8, 19, "z", 22.5), (9.9, 8, 20, "z", -22.5),
+        (8, 8, 21, "z", 0), (6.3, 8, 19, "z", 22.5), (9.7, 8, 20, "z", -22.5),
         (8, 6.2, 20, "x", -22.5), (8, 9.8, 18, "x", 22.5),
-        (6.1, 6.2, 18, "z", 22.5), (9.9, 9.8, 19, "z", -22.5),
+        (6.3, 6.2, 18, "z", 22.5), (9.7, 9.8, 19, "z", -22.5),
     )):
         rot = [0, 0, 0]
         rot["xyz".index(axis)] = angle
         group = f"签 {i + 1} / Stick {i + 1}"
-        pivot = [x, 9, z]
-        e = cube(group, [x - .5, 6, z - .5], [x + .5, top, z + .5],
+        pivot = [x, 9.3, z]
+        e = cube(group, [x - 1, 6, z - .5], [x + 1, top, z + .5],
                  dict(north="bamboo", south="bamboo", east="bamboo", west="bamboo",
                       up=("bamboo_end", 1), down="bamboo_end"), group, rot, pivot)
         rig.append({"index": i, "element": e["uuid"], "origin": pivot, "rotation": rot})
@@ -221,13 +248,18 @@ def make_model():
                 continue
             i = f.pop("_tile")
             x, y = positions[i]
-            w, h = atlas.tiles[i].size
+            w, h = f.pop("_uv_size")
             f["uv"] = [x, y, x + w, y + h]
+            flip = f.pop("_flip", None)
+            if flip == "u":
+                f["uv"][0], f["uv"][2] = f["uv"][2], f["uv"][0]
+            elif flip == "v":
+                f["uv"][1], f["uv"][3] = f["uv"][3], f["uv"][1]
     stream = io.BytesIO()
     texture.save(stream, format="PNG")
     model = {
         "meta": {"format_version": "4.10", "model_format": "java_block", "box_uv": False},
-        "name": "问津签筒 · 原版像素试作", "model_identifier": STEM,
+        "name": "问津签筒 · 原版像素试作二版", "model_identifier": STEM,
         "resolution": {"width": texture.width, "height": texture.height},
         "java_block_version": "1.9", "ambientocclusion": True,
         "elements": elements,
@@ -283,10 +315,12 @@ def verify(model, texture, rig, immutable):
         assert len(rot) <= 1 and all(v in (-45, -22.5, 22.5, 45) for v in rot)
     for path, before in immutable.items():
         assert hashlib.sha256(path.read_bytes()).hexdigest() == before, f"Changed shipped asset: {path}"
-    return {"status": "local art prototype; not installed or released", "elements": len(model["elements"]),
+    return {"status": "local art prototype; not installed or released", "revision": 2, "elements": len(model["elements"]),
             "quads": len(faces), "triangles": len(faces) * 2, "texture": list(texture.size),
             "texelsPerBlock": 16, "stickGroups": len(rig),
             "foliageQuads": sum(sum(f["texture"] is not None for f in e["faces"].values()) for e in model["elements"] if "leaves" in e["name"].lower()),
+            "hoopQuads": sum(sum(f["texture"] is not None for f in e["faces"].values()) for e in model["elements"] if "箍" in e["name"]),
+            "previousPrototypeQuads": 106,
             "sourceAndRuntimePreserved": True,
             "baselineRuntimeQuads": 372, "reductionAgainstRuntimePercent": round(100 * (1 - len(faces) / 372), 1),
             "performance": "Static geometry only; no in-game FPS claim."}
@@ -301,7 +335,7 @@ def previews(model, report):
     font_path = Path("C:/Windows/Fonts/msyh.ttc")
     font = ImageFont.truetype(str(font_path), 23) if font_path.exists() else ImageFont.load_default()
     small = ImageFont.truetype(str(font_path), 17) if font_path.exists() else ImageFont.load_default()
-    draw.text((35, 22), "问津签筒  /  原版像素试作", font=font, fill=(224, 226, 215))
+    draw.text((35, 22), "问津签筒  /  原版像素试作 · 二版", font=font, fill=(224, 226, 215))
     draw.text((35, 58), f"16× 像素密度   ·   {report['quads']} 个四边面   ·   7 支独立签", font=small, fill=(156, 167, 149))
     for i, (view, label) in enumerate((((.7, .42, 1), "正面"), ((-.75, .45, -1), "背面"), ((.35, 1.3, 1), "俯视"))):
         pixels = render(model, view, bounds)

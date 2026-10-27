@@ -1,17 +1,20 @@
 {
   "status": "local art prototype; not installed or released",
-  "elements": 21,
-  "quads": 106,
-  "triangles": 212,
+  "revision": 2,
+  "elements": 35,
+  "quads": 123,
+  "triangles": 246,
   "texture": [
     64,
     64
   ],
   "texelsPerBlock": 16,
   "stickGroups": 7,
-  "foliageQuads": 17,
+  "foliageQuads": 10,
+  "hoopQuads": 24,
+  "previousPrototypeQuads": 106,
   "sourceAndRuntimePreserved": true,
   "baselineRuntimeQuads": 372,
-  "reductionAgainstRuntimePercent": 71.5,
+  "reductionAgainstRuntimePercent": 66.9,
   "performance": "Static geometry only; no in-game FPS claim."
 }
