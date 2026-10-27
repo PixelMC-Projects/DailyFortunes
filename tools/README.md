@@ -23,6 +23,8 @@ python tools/preview_runtime_models.py
 
 检查须同时看正侧面、背面和俯视图，以及实际游戏内物品栏、掉落物、手持与摆放表现。`gradlew runVisualClient -Pbenchmark` 对同一批蓝本/派生模型做实际绘制比较，结果在 `build/verification/render-benchmark`。这不是整合包总帧率测试。
 
-上述命令是验证方法，不能当作本轮最终资源的已通过记录；实际执行结果另记于 `docs/verification.md`。本轮香草纪元客户端实测待用户完成，不创建新GitHub Release。
+上述命令是验证方法，不能当作本轮最终资源的已通过记录；实际执行结果另记于 `docs/verification.md`。香草纪元客户端的实际帧率与观感仍需游戏内验收，发行附件以对应Tag的资源为准。
+
+新方块先按面数、透明区域、图集占用、动态部件与大量摆放场景分配预算。先用低面主体进入游戏验证，再逐步加细节；木纹、刻痕和小钉默认用贴图，几何优先用于轮廓与空间层次。高精蓝本保留作烘焙来源，运行模型每次从蓝本重新生成，不反复加工已经有损精简的产物。现有规则针对这三个模型，新模型不能未经检查直接套用并宣称无损。
 
 查看过的通用烘焙参考：[Principled Baker](https://github.com/danielenger/Principled-Baker)。本项目未复制其代码，也不依赖该插件或 Blender；这里的几何分组、透明裁切与导出脚本由本项目实现。
