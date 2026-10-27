@@ -6,6 +6,7 @@ their existing supporting surfaces. Roof, brackets, cat and foliage stay 3D.
 import numpy as np
 
 
+
 def _center(ctx, element):
     lo, hi = ctx.bounds(element)
     return (lo + hi) / 2
@@ -38,6 +39,51 @@ def _components(ctx, elements, gap=.11):
 
 def early(ctx):
     elements = ctx.es
+
+    # Omit the concealed upper roof frame and tiny inner-mouth fittings.
+    # The exterior eaves, tiled slopes, bracket sets and main beams remain.
+    hidden = [e for e in elements if e['name'] in {
+        '口内护角', '护角铆钉', '盘内铜压边', '内柱',
+        '梁上短柱', '二层短梁', '脊瓜柱', '脊柱叉手', '脊檩',
+        '纵向檩木'}]
+    ctx.consumed.update(e['uuid'] for e in hidden)
+
+    # Each corner bracket remains a small three-dimensional assembly. Its tiny
+    # stacked blocks and recesses become alpha/color on that local envelope.
+    bracket_names = {'斗拱柱头方斗', '斗口承盘', '第一层横栱', '栱端升斗',
+                     '第二层纵栱', '纵栱升斗'}
+    for sx in (False, True):
+        for sz in (False, True):
+            members = [e for e in elements if e['name'] in bracket_names
+                       and (_center(ctx, e)[0] > 8) == sx
+                       and (_center(ctx, e)[2] > 8) == sz]
+            ctx.take(members, f'profile-local-bracket-{int(sx)}-{int(sz)}')
+    tassel = [e for e in elements if e['name'] in {'挂绳', '红绳盘结', '束珠'}]
+    ctx.take(tassel, 'profile-red-tassel-card', card_axis=2)
+
+    # Tiny side-frame relief is represented by the same colors on its support.
+    for side in (False, True):
+        parents = [e for e in elements if e['name'] == '侧板'
+                   and (_center(ctx, e)[0] > 8) == side]
+        details = [e for e in elements if e['name'] in {
+            '侧板内凹', '侧榫竖框', '侧榫横框', '柱外削边', '板面榫钉'}
+            and (_center(ctx, e)[0] > 8) == side]
+        if parents:
+            ctx.take(parents + details, f'profile-flat-side-panel-{int(side)}',
+                     template=_template(ctx, parents, 'side-support'))
+        window = [e for e in elements if e['name'] == '格窗暗底'
+                  and (_center(ctx, e)[0] > 8) == side]
+        frames = [e for e in elements if e['name'] in {'格窗横框', '格窗竖框'}
+                  and (_center(ctx, e)[0] > 8) == side]
+        if window:
+            ctx.take(window + frames, f'profile-flat-window-frame-{int(side)}',
+                     template=_template(ctx, window, 'window-support'))
+        ring = [e for e in elements if e['name'] in {'拉环背板', '拉环横边', '拉环竖边'}
+                and (_center(ctx, e)[0] > 8) == side]
+        if ring:
+            ctx.take(ring, f'profile-cutout-side-ring-{int(side)}', card_axis=0)
+    back_ring = [e for e in elements if e['name'] in {'背门拉环横', '背门拉环竖'}]
+    ctx.take(back_ring, 'profile-cutout-back-ring', card_axis=2)
 
     # Keep the four paired fruit bodies' current low-poly envelope. Their green
     # calyx, pointed bottom and pale raised strip become pixels on that envelope.
@@ -72,7 +118,7 @@ def early(ctx):
     for side in (False, True):
         panels = [e for e in elements if e['name'].startswith('检修门内板_')
                   and (_center(ctx, e)[0] > 8) == side]
-        fittings = [e for e in elements if e['name'] in ('铜合页', '合页铆钉')
+        fittings = [e for e in elements if e['name'] in ('铜合页', '合页铆钉', '检修门压边', '检修门竖边')
                     and (_center(ctx, e)[0] > 8) == side]
         if panels and fittings:
             label = 'profile-side-door-' + str(int(side))
@@ -80,12 +126,14 @@ def early(ctx):
 
     rear = [e for e in elements if e['name'] == '后门拼板']
     rear_hardware = [e for e in elements
-                     if e['name'] in ('后门铜合页', '后合页铆钉', '背门锁扣')]
+                     if e['name'] in ('后门铜合页', '后合页铆钉', '背门锁扣', '后门横撑', '后门竖边')]
     if rear and rear_hardware:
         label = 'profile-rear-door-hardware'
         ctx.take(rear + rear_hardware, label, template=_template(ctx, rear, label))
 
 
 def late(ctx):
-    # All changes are source-to-support bakes. Nothing is silently removed here.
-    pass
+    # Roof tiles hide these rafter upper faces; the visible underside and ends stay.
+    for element in ctx.output:
+        if element['name'] == 'baked-rafter-array':
+            element['faces'].pop('up', None)

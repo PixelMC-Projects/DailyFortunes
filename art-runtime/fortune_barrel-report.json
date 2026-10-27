@@ -2,18 +2,27 @@
   "model": "fortune_barrel",
   "masterSha256": "41d2e4a68d2cc7c0f58ffc4ff60902a29b76fa31dac0e76fffa13e4e3bd9f9b6",
   "beforeElements": 1292,
-  "afterElements": 301,
+  "afterElements": 286,
   "beforeQuads": 7224,
-  "afterQuads": 562,
-  "reductionPercent": 92.22,
-  "hiddenFacesRemoved": 16,
-  "coplanarQuadsSaved": 114,
+  "afterQuads": 372,
+  "reductionPercent": 94.85,
+  "hiddenFacesRemoved": 0,
+  "coplanarQuadsSaved": 106,
   "thinSideQuadsSaved": 0,
   "atlas": [
+    1024,
+    1024
+  ],
+  "unpackedAtlas": [
     1024,
     2048
   ],
   "operations": [
+    {
+      "operation": "profile-red-knot-card",
+      "sourceElements": 4,
+      "faces": 2
+    },
     {
       "operation": "baked-floor-card",
       "sourceElements": 17,

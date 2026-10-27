@@ -17,7 +17,7 @@
 
 ## 服务器与网页
 
-1. 安装 DailyFortunes 0.2.0 与 PixelMC Manager 0.6.0 或兼容新版，部署 Manager 独立网页服务，并配置其统一 MariaDB 数据库和游戏桥接。
+1. 安装 DailyFortunes 0.2.1 与 PixelMC Manager 0.6.0 或兼容新版，部署附件中的 Manager 独立网页服务，并配置其统一 MariaDB 数据库和游戏桥接。
 2. 在 Manager 服务中启用抽签模块；本模组的 `config/dailyfortunes/server.json` 保持 `mode: auto`。抽签数据注册在 Manager 管理的 `dailyfortunes` 命名空间，玩家与头像使用统一玩家库。
 3. 启动后，Manager 左侧出现“抽签管理”。可编辑签文、查看所有玩家签历、补领、调整设置、备份和撤回单项修改。
 

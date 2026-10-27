@@ -365,7 +365,7 @@ public final class FortuneClient {
   private static final LinkedHashMap<net.minecraft.core.BlockPos, ChestEntity> VISIBLE_CHESTS =
       new LinkedHashMap<>();
 
-  private static final float DISPLAY_SIZE = .62F;
+  private static final float DISPLAY_SIZE = .50F;
   // Keep the paper's lower edge just above the wooden lid, using the same plane for aiming.
   private static final double DISPLAY_CENTER_Y = BlockGeometry.CHEST_TOP + .04 + DISPLAY_SIZE / 2;
 
@@ -405,7 +405,7 @@ public final class FortuneClient {
     }
 
     public boolean shouldRenderOffScreen(ChestEntity c) {
-      return true;
+      return false;
     }
 
     public int getViewDistance() {
@@ -465,11 +465,7 @@ public final class FortuneClient {
       }
       if (mc.screen != null || mc.options.hideGui) return;
       Vec3 eye = mc.player.getEyePosition(), end = eye.add(mc.player.getViewVector(1).scale(6));
-      BlockHitResult hit =
-          mc.level.clip(
-              new ClipContext(
-                  eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, mc.player));
-      double nearest = eye.distanceToSqr(hit.getLocation());
+      double nearest = 36;
       ChestEntity target = null;
       // Candidates come from the renderer; no per-frame volume or chunk scan.
       var candidates = VISIBLE_CHESTS.entrySet().iterator();
@@ -508,8 +504,16 @@ public final class FortuneClient {
         scroll = 0;
         return;
       }
+      // The block raycast can be expensive in a modpack. Only do it after the
+      // crosshair actually intersects opaque pixels of a nearby displayed slip.
+      BlockHitResult hit =
+          mc.level.clip(
+              new ClipContext(
+                  eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, mc.player));
+      if (eye.distanceToSqr(hit.getLocation()) < nearest) return;
       try {
-        JsonObject r = JsonParser.parseString(target.display).getAsJsonObject();
+        JsonObject r = target.displayData();
+        if (r == null) return;
         if (r.has("hover") && !b(r, "hover")) return;
         String id = s(r, "id");
         if (!id.equals(key)) {

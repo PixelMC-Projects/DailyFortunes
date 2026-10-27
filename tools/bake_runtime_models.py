@@ -65,6 +65,64 @@ def bounds(e):
     return points.min(axis=0), points.max(axis=0)
 
 
+def compact_atlas(elements, atlas):
+    """Copy only referenced pixel rectangles; no resampling or color changes."""
+    packer = Baker(Image.new('RGBA', (1024, 1)))
+    references = []
+    for element in elements:
+        for face in element['faces'].values():
+            if face.get('texture') is None:
+                continue
+            uv = face['uv']
+            left, top = math.floor(min(uv[0], uv[2])), math.floor(min(uv[1], uv[3]))
+            right, bottom = math.ceil(max(uv[0], uv[2])), math.ceil(max(uv[1], uv[3]))
+            right, bottom = max(left + 1, right), max(top + 1, bottom)
+            assert 0 <= left < right <= atlas.width and 0 <= top < bottom <= atlas.height
+            tile = atlas.crop((left, top, right, bottom))
+            key = (tile.size, hashlib.sha256(tile.tobytes()).digest())
+            if key not in packer.cache:
+                packer.cache[key] = len(packer.tiles)
+                packer.tiles.append(tile)
+            references.append((face, list(uv), left, top, packer.cache[key]))
+    compact, locations = packer.atlas()
+    for face, uv, left, top, index in references:
+        x, y, width, height = locations[index]
+        assert compact.crop((x, y, x + width, y + height)).tobytes() == packer.tiles[index].tobytes()
+        face['uv'] = [uv[0] - left + x, uv[1] - top + y,
+                      uv[2] - left + x, uv[3] - top + y]
+    return compact
+
+
+def local_surface_groups(faces, expansion=1.25):
+    """Merge close fragments without large transparent rectangles between them."""
+    first = faces[0][2]
+    face = faces[0][1]
+    axis = 0 if face in ('east', 'west') else 1 if face in ('up', 'down') else 2
+    transform = rotation(first.get('rotation', [0, 0, 0]))
+    origin = np.array(first['origin'])
+    groups = []
+    for entry in faces:
+        points = np.delete((entry[3] - origin) @ transform + origin, axis, axis=1)
+        covered = float(np.linalg.norm(np.cross(entry[3][1] - entry[3][0], entry[3][3] - entry[3][0])))
+        groups.append(([entry], points.min(axis=0), points.max(axis=0), covered))
+    while True:
+        best = None
+        for i, (_, lo, hi, covered) in enumerate(groups):
+            for j in range(i + 1, len(groups)):
+                _, other_lo, other_hi, other_covered = groups[j]
+                combined_lo, combined_hi = np.minimum(lo, other_lo), np.maximum(hi, other_hi)
+                area = float(np.prod(combined_hi - combined_lo))
+                ratio = area / max(covered + other_covered, 1e-9)
+                if ratio <= expansion and (best is None or ratio < best[0]):
+                    best = (ratio, i, j, combined_lo, combined_hi)
+        if best is None:
+            return [group[0] for group in groups]
+        _, i, j, lo, hi = best
+        a, b = groups[i], groups[j]
+        groups[i] = (a[0] + b[0], lo, hi, a[3] + b[3])
+        groups.pop(j)
+
+
 class Baker:
     def __init__(self, source):
         self.original=np.array(source.convert('RGBA'))
@@ -394,15 +452,26 @@ def optimize(stem):
             key=(partition,tuple(np.round(normal,5)),round(distance/.10))
             only=copy.deepcopy(e);only['faces']={face:copy.deepcopy(e['faces'][face])}
             buckets[key].append((index,face,only,points))
+    work=[]
+    for key, faces in buckets.items():
+        if len(faces)<2:continue
+        first=faces[0][2];face=faces[0][1]
+        proxy=normalize(proxy_box([f[2] for f in faces], 'surface-test', first['rotation'], first['origin']))
+        axis=0 if face in ('east','west') else 1 if face in ('up','down') else 2
+        area=float(np.prod(np.delete(np.array(proxy['to'])-proxy['from'],axis)))
+        covered=sum(float(np.linalg.norm(np.cross(f[3][1]-f[3][0],f[3][3]-f[3][0]))) for f in faces)
+        if area<=max(covered*3,6):
+            work.append((key,faces))
+        else:
+            work.extend((key,group) for group in local_surface_groups(faces) if len(group)>1)
     cards=[];merged_faces=0
-    for key,faces in buckets.items():
+    for key,faces in work:
         if len(faces)<2:continue
         sources=[f[2] for f in faces];first=faces[0][2];face=faces[0][1]
         proxy=normalize(proxy_box(sources,'merged-surface',first['rotation'],first['origin']))
         axis=0 if face in ('east','west') else 1 if face in ('up','down') else 2
         dims=np.array(proxy['to'])-proxy['from'];area=float(np.prod(np.delete(dims,axis)))
         covered=sum(float(np.linalg.norm(np.cross(f[3][1]-f[3][0],f[3][3]-f[3][0]))) for f in faces)
-        if area>max(covered*3,6):continue
         middle=(proxy['from'][axis]+proxy['to'][axis])/2;proxy['from'][axis]=proxy['to'][axis]=middle
         proxy['faces']={face:proxy['faces'][face]}
         proxy['name']=key[0] if key[0]!='shell' else 'coplanar-surface-'+str(len(cards))
@@ -416,6 +485,9 @@ def optimize(stem):
     for e in cards:
         for f in e['faces'].values():
             x,y,w,h=locations[f.pop('tile')];f['uv']=[x,y,x+w,y+h]
+
+    unpacked_atlas = [atlas.width, atlas.height]
+    atlas = compact_atlas(output, atlas)
 
     DERIVED.mkdir(exist_ok=True)
     derived=copy.deepcopy(master); derived['name']=stem+' optimized game mesh'; derived['elements']=output
@@ -451,7 +523,7 @@ def optimize(stem):
             (ASSETS/f'models/item/barrel_stick_{i}.json').write_text(json.dumps(export([e for e in output if e['name']==f'baked-stick-{i}']),ensure_ascii=False,separators=(',',':')),'utf-8')
     assert source_path.read_bytes()==raw,'Master was modified'
     before=baseline_quads; after=sum(len(e['faces']) for e in runtime['elements'])
-    report={'model':stem,'masterSha256':hashlib.sha256(raw).hexdigest(),'beforeElements':len(es),'afterElements':len(output),'beforeQuads':before,'afterQuads':after,'reductionPercent':round((1-after/before)*100,2),'hiddenFacesRemoved':removed,'coplanarQuadsSaved':merged_faces,'thinSideQuadsSaved':thin_faces_saved,'atlas':[atlas.width,atlas.height],'operations':operations}
+    report={'model':stem,'masterSha256':hashlib.sha256(raw).hexdigest(),'beforeElements':len(es),'afterElements':len(output),'beforeQuads':before,'afterQuads':after,'reductionPercent':round((1-after/before)*100,2),'hiddenFacesRemoved':removed,'coplanarQuadsSaved':merged_faces,'thinSideQuadsSaved':thin_faces_saved,'atlas':[atlas.width,atlas.height],'unpackedAtlas':unpacked_atlas,'operations':operations}
     (DERIVED/f'{stem}-report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),'utf-8')
     print(json.dumps({k:v for k,v in report.items() if k!='operations'}),flush=True)
     return report

@@ -2,18 +2,82 @@
   "model": "interpretation_shrine",
   "masterSha256": "bffe8f9b00c114d5554804affd37186471cda867549b7f16b2a7aef04ba07e7e",
   "beforeElements": 980,
-  "afterElements": 436,
+  "afterElements": 314,
   "beforeQuads": 5604,
-  "afterQuads": 1183,
-  "reductionPercent": 78.89,
-  "hiddenFacesRemoved": 173,
-  "coplanarQuadsSaved": 241,
-  "thinSideQuadsSaved": 89,
+  "afterQuads": 613,
+  "reductionPercent": 89.06,
+  "hiddenFacesRemoved": 81,
+  "coplanarQuadsSaved": 181,
+  "thinSideQuadsSaved": 77,
   "atlas": [
     1024,
-    2048
+    1024
+  ],
+  "unpackedAtlas": [
+    1024,
+    4096
   ],
   "operations": [
+    {
+      "operation": "profile-local-bracket-0-0",
+      "sourceElements": 8,
+      "faces": 6
+    },
+    {
+      "operation": "profile-local-bracket-0-1",
+      "sourceElements": 8,
+      "faces": 6
+    },
+    {
+      "operation": "profile-local-bracket-1-0",
+      "sourceElements": 8,
+      "faces": 6
+    },
+    {
+      "operation": "profile-local-bracket-1-1",
+      "sourceElements": 8,
+      "faces": 6
+    },
+    {
+      "operation": "profile-red-tassel-card",
+      "sourceElements": 5,
+      "faces": 2
+    },
+    {
+      "operation": "profile-flat-side-panel-0",
+      "sourceElements": 10,
+      "faces": 6
+    },
+    {
+      "operation": "profile-flat-window-frame-0",
+      "sourceElements": 5,
+      "faces": 6
+    },
+    {
+      "operation": "profile-cutout-side-ring-0",
+      "sourceElements": 5,
+      "faces": 2
+    },
+    {
+      "operation": "profile-flat-side-panel-1",
+      "sourceElements": 10,
+      "faces": 6
+    },
+    {
+      "operation": "profile-flat-window-frame-1",
+      "sourceElements": 5,
+      "faces": 6
+    },
+    {
+      "operation": "profile-cutout-side-ring-1",
+      "sourceElements": 5,
+      "faces": 2
+    },
+    {
+      "operation": "profile-cutout-back-ring",
+      "sourceElements": 4,
+      "faces": 2
+    },
     {
       "operation": "profile-fruit-pair-0",
       "sourceElements": 8,
@@ -46,17 +110,17 @@
     },
     {
       "operation": "profile-side-door-0",
-      "sourceElements": 9,
+      "sourceElements": 13,
       "faces": 6
     },
     {
       "operation": "profile-side-door-1",
-      "sourceElements": 9,
+      "sourceElements": 13,
       "faces": 6
     },
     {
       "operation": "profile-rear-door-hardware",
-      "sourceElements": 13,
+      "sourceElements": 17,
       "faces": 6
     },
     {
@@ -280,18 +344,8 @@
       "faces": 6
     },
     {
-      "operation": "baked-relief-口内护角",
-      "sourceElements": 2,
-      "faces": 6
-    },
-    {
-      "operation": "baked-relief-口内护角",
-      "sourceElements": 2,
-      "faces": 6
-    },
-    {
-      "operation": "baked-relief-侧板",
-      "sourceElements": 2,
+      "operation": "baked-relief-盘侧",
+      "sourceElements": 4,
       "faces": 6
     },
     {
@@ -301,21 +355,11 @@
     },
     {
       "operation": "baked-relief-盘侧",
-      "sourceElements": 3,
-      "faces": 6
-    },
-    {
-      "operation": "baked-relief-侧板",
-      "sourceElements": 2,
+      "sourceElements": 4,
       "faces": 6
     },
     {
       "operation": "baked-relief-前立柱",
-      "sourceElements": 3,
-      "faces": 6
-    },
-    {
-      "operation": "baked-relief-盘侧",
       "sourceElements": 3,
       "faces": 6
     },

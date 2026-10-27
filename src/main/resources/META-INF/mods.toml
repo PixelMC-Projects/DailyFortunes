@@ -3,7 +3,7 @@ loaderVersion="[47,)"
 license="AGPL-3.0-only"
 [[mods]]
 modId="dailyfortunes"
-version="0.2.0"
+version="0.2.1"
 displayName="DailyFortunes"
 authors="PixelMC Projects"
 description='''每日抽签、解签与永久签历收藏。Daily fortunes and persistent personal calendars.'''

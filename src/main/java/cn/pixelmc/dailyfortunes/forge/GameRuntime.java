@@ -4,6 +4,7 @@ import static cn.pixelmc.dailyfortunes.service.FortuneBackend.*;
 
 import cn.pixelmc.dailyfortunes.DailyFortunes;
 import cn.pixelmc.dailyfortunes.service.FortuneBackend;
+import cn.pixelmc.dailyfortunes.service.FortuneRpcResponse;
 import com.google.gson.*;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import java.nio.file.*;
@@ -208,7 +209,7 @@ public final class GameRuntime {
             (CompletableFuture<String>)
                 api.getMethod("call", String.class, String.class, String.class)
                     .invoke(null, "dailyfortunes", op, JSON.toJson(data));
-        return f.thenApply(j -> JsonParser.parseString(j).getAsJsonObject());
+        return f.thenApply(FortuneRpcResponse::decode);
       } catch (Exception e) {
         return CompletableFuture.failedFuture(new IllegalStateException("Manager 未连接，稍后再试"));
       }
@@ -425,8 +426,8 @@ public final class GameRuntime {
   }
 
   private void calendar(ServerPlayer p, JsonObject v) {
-    ChestEntity chest = session(p);
-    v.addProperty("canDisplay", p.getUUID().equals(chest.owner));
+    session(p);
+    v.addProperty("canDisplay", true);
     FortuneNetwork.send(p, "calendar", JSON.toJson(v));
   }
 
@@ -444,7 +445,6 @@ public final class GameRuntime {
           throw new IllegalArgumentException("月份超出范围");
         r.run(p, () -> r.call(p, "calendar", value), v -> r.calendar(p, v), true);
       } else if (action.equals("display") || action.equals("clear")) {
-        if (!p.getUUID().equals(chest.owner)) throw new IllegalArgumentException("只有放置者可以选择展示签笺");
         if (action.equals("clear")) {
           chest.display = "";
           chest.changed();
@@ -455,10 +455,8 @@ public final class GameRuntime {
             () -> r.call(p, "display", value),
             v -> {
               ChestEntity live = r.session(p);
-              if (!p.getUUID().equals(live.owner)) return;
-              JsonObject display = v.getAsJsonObject("record");
-              display.addProperty("hover", b(v.getAsJsonObject("settings"), "hover"));
-              live.display = JSON.toJson(display);
+              if (live != chest) throw new IllegalArgumentException("藏签匣已切换，请重新选择展示签笺");
+              live.display = DisplaySelection.serialize(p.getUUID(), value, v);
               live.changed();
               message(p, "已更新藏签匣的展示签笺。");
             },

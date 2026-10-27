@@ -2,7 +2,10 @@
 import numpy as np
 
 
+
 def early(ctx):
+    knot = [e for e in ctx.es if e['name'] in {'系绳', '盘长结上环', '盘长结心'}]
+    ctx.take(knot, 'profile-red-knot-card', card_axis=2)
     floor = [e for e in ctx.es if e['name'].startswith('桶底拼板') or e['name'] == '底板暗色衬底']
     if floor:
         template = ctx.normalize(ctx.proxy_box(floor, 'baked-floor-card'))
@@ -21,7 +24,11 @@ def late(ctx):
                'west': (-1, 0, 0), 'up': (0, 1, 0), 'down': (0, -1, 0)}
     count = 0
     for element in ctx.output:
-        if not element['name'].startswith(('baked-上箍 ', 'baked-下箍 ')):
+        hoop = element['name'].startswith(('baked-上箍 ', 'baked-下箍 '))
+        foot = element['name'].startswith('baked-relief-底部足圈 ')
+        rim = element['name'].startswith('baked-分段顶木 ')
+        wall = element['name'].startswith('榆木桶壁 ')
+        if not (hoop or foot or rim or wall):
             continue
         transform = ctx.rotation(element.get('rotation', [0, 0, 0]))
         origin = np.array(element.get('origin', [8., 0., 8.]))
@@ -33,7 +40,12 @@ def late(ctx):
         # A ring sector's radial outer wall is the visible surface. Keep its exact location,
         # texture and 16-sided silhouette; omit inner/end/top/bottom microscopic walls.
         face = max(element['faces'], key=lambda name: float((transform @ normals[name]) @ radial))
-        element['faces'] = {face: element['faces'][face]}
-        count += 1
+        if rim or wall:
+            inside = min(element['faces'], key=lambda name: float((transform @ normals[name]) @ radial))
+            keep = {face, inside} | ({'up'} if rim else set())
+            element['faces'] = {name: f for name, f in element['faces'].items() if name in keep}
+        else:
+            element['faces'] = {face: element['faces'][face]}
+        if hoop: count += 1
     if count != 32:
         raise AssertionError(f'Expected 32 preserved outer hoop sectors, found {count}')
