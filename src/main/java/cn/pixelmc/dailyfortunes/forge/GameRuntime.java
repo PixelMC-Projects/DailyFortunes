@@ -50,7 +50,7 @@ public final class GameRuntime {
             return t;
           });
   private FortuneBackend backend;
-  private boolean remote = true, stopped;
+  private boolean remote = true, bridgeReady, stopped;
   private long tickAt;
 
   private GameRuntime(MinecraftServer server) {
@@ -105,13 +105,19 @@ public final class GameRuntime {
                 "",
                 local);
       } else if (remote) {
-        Class.forName("com.pixelmc.pixelmcmanager.api.ManagerBridgeApi")
-            .getMethod("register", String.class, String.class, String.class, String.class)
-            .invoke(null, "dailyfortunes", "DailyFortunes", "0.1.2", "每日抽签,玩家签历,永久收藏,解签龛");
+        Class<?> api = Class.forName("com.pixelmc.pixelmcmanager.api.ManagerBridgeApi");
+        // Resolve the new API before registering: an older Manager must not partially connect.
+        var storage = api.getMethod("registerStorage", String.class, String.class);
+        api.getMethod("register", String.class, String.class, String.class, String.class)
+            .invoke(null, "dailyfortunes", "DailyFortunes", VERSION, "每日抽签,玩家签历,永久收藏,解签龛");
+        storage.invoke(null, "dailyfortunes", JSON.toJson(storageManifest()));
+        bridgeReady = true;
       } else {
         JsonObject db = config.getAsJsonObject("database");
         backend = new FortuneBackend(s(db, "url"), s(db, "user"), s(db, "password"), dir);
       }
+    } catch (NoSuchMethodException e) {
+      System.err.println("[DailyFortunes] 当前 Manager 不支持统一存储注册，请升级到 0.6.0 或更高兼容版本；未切换到其他数据库。");
     } catch (Exception e) {
       System.err.println(
           "[DailyFortunes] 配置/Manager桥接未就绪，抽签暂不可用；请检查 config/dailyfortunes/server.json。");
@@ -128,11 +134,14 @@ public final class GameRuntime {
   }
 
   private static boolean real(ServerPlayer p) {
-    String type = p.getClass().getName().toLowerCase(Locale.ROOT);
-    return !(p instanceof FakePlayer)
-        && !type.contains("fakeplayer")
-        && !type.contains("playerfake")
-        && !type.contains("entityplayerfake");
+    if (p instanceof FakePlayer) return false;
+    for (Class<?> type = p.getClass(); type != null; type = type.getSuperclass()) {
+      String name = type.getName().toLowerCase(Locale.ROOT);
+      if (name.contains("fakeplayer")
+          || name.contains("playerfake")
+          || name.contains("entityplayerfake")) return false;
+    }
+    return true;
   }
 
   @SubscribeEvent
@@ -189,6 +198,9 @@ public final class GameRuntime {
     for (Object v : args) a.add(JSON.toJsonTree(v));
     JsonObject data = obj("args", a);
     if (remote) {
+      if (!bridgeReady)
+        return CompletableFuture.failedFuture(
+            new IllegalStateException("Manager 统一存储桥接未就绪，请检查兼容版本和配置"));
       try {
         Class<?> api = Class.forName("com.pixelmc.pixelmcmanager.api.ManagerBridgeApi");
         @SuppressWarnings("unchecked")

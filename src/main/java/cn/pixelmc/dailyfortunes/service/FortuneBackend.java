@@ -10,11 +10,13 @@ import java.text.Collator;
 import java.time.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Function;
 
 /** Shared authority for Manager and standalone Forge. Call only from bounded I/O workers. */
 public final class FortuneBackend implements AutoCloseable {
   public static final Gson JSON = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
   public static final List<String> GRADES = List.of("上上签", "上吉签", "中平签", "小凶签", "下下签");
+  public static final String VERSION = "0.2.0";
   private final String url, user, password;
   private final Path folder;
   private final SecureRandom random = new SecureRandom();
@@ -22,6 +24,8 @@ public final class FortuneBackend implements AutoCloseable {
   private volatile boolean healthy;
   private volatile long lastSuccess;
   private String lastError = "尚未连接";
+  private volatile Function<JsonObject, JsonObject> platform;
+  private ScheduledFuture<?> automaticBackup;
   private final ScheduledExecutorService backups =
       Executors.newSingleThreadScheduledExecutor(
           r -> {
@@ -37,16 +41,101 @@ public final class FortuneBackend implements AutoCloseable {
     this.user = user;
     this.password = password;
     this.folder = folder.toAbsolutePath().normalize();
-    backups.scheduleWithFixedDelay(
-        () -> {
-          try {
-            request("POST", "/backup", new JsonObject(), Map.of(), "自动备份", Set.of());
-          } catch (Exception ignored) {
-          }
-        },
-        12,
-        12,
-        TimeUnit.HOURS);
+    scheduleBackup();
+  }
+
+  private void scheduleBackup() {
+    automaticBackup =
+        backups.scheduleWithFixedDelay(
+            () -> {
+              synchronized (this) {
+                if (platform != null || closed) return;
+                try {
+                  request("POST", "/backup", new JsonObject(), Map.of(), "自动备份", Set.of());
+                } catch (Exception ignored) {
+                }
+              }
+            },
+            12,
+            12,
+            TimeUnit.HOURS);
+  }
+
+  /** Bind a Manager-owned, namespace-scoped directory. Null restores standalone ownership. */
+  public synchronized void attachPlatform(Function<JsonObject, JsonObject> platform) {
+    if (closed) throw new IllegalStateException("抽签服务已停止");
+    if (automaticBackup != null) automaticBackup.cancel(false);
+    this.platform = platform;
+    if (platform == null) scheduleBackup();
+  }
+
+  public static JsonObject storageManifest() {
+    return obj(
+        "version",
+        1,
+        "scope",
+        "global",
+        "label",
+        "每日一签",
+        "name",
+        "DailyFortunes",
+        "page",
+        "fortunes",
+        "preference",
+        "fortunes",
+        "tables",
+        List.of(
+            "df_schema",
+            "df_settings",
+            "df_fortunes",
+            "df_players",
+            "df_records",
+            "df_audit",
+            "df_ids",
+            "df_requests"),
+        "fields",
+        List.of(),
+        "files",
+        List.of("definitions.json"),
+        "capabilities",
+        List.of("calendar", "receipts", "backup", "conflict-aware-undo"));
+  }
+
+  private JsonObject platformCall(JsonObject request) {
+    Function<JsonObject, JsonObject> callback = platform;
+    if (callback == null) throw new IllegalStateException("统一玩家库未连接");
+    try {
+      JsonObject response = callback.apply(request);
+      if (response == null || response.has("error")) throw new IllegalStateException("统一玩家库暂不可用");
+      return response;
+    } catch (RuntimeException e) {
+      throw new IllegalStateException("统一玩家库暂不可用，请稍后重试", e);
+    }
+  }
+
+  private JsonObject platformProfile(String id) {
+    JsonObject response = platformCall(obj("op", "profiles.get", "player", id));
+    if (!response.has("profile") || response.get("profile").isJsonNull())
+      throw new IllegalArgumentException("统一玩家库中没有该玩家");
+    JsonObject profile = response.getAsJsonObject("profile");
+    if (!id.equals(s(profile, "id")) || s(profile, "name").isBlank())
+      throw new IllegalStateException("统一玩家资料不完整");
+    return profile.deepCopy();
+  }
+
+  private List<JsonObject> platformProfiles() {
+    JsonObject response = platformCall(obj("op", "profiles.list"));
+    if (!response.has("players") || !response.get("players").isJsonArray())
+      throw new IllegalStateException("统一玩家目录不完整");
+    List<JsonObject> players = new ArrayList<>();
+    Set<UUID> seen = new HashSet<>();
+    for (JsonElement entry : response.getAsJsonArray("players")) {
+      JsonObject player = entry.getAsJsonObject();
+      UUID id = UUID.fromString(s(player, "id"));
+      if (s(player, "name").isBlank() || !seen.add(id)) throw new IllegalStateException("统一玩家目录无效");
+      players.add(player.deepCopy());
+    }
+    return players;
   }
 
   public JsonObject status() {
@@ -54,7 +143,11 @@ public final class FortuneBackend implements AutoCloseable {
         "database",
         healthy,
         "version",
-        "0.1.0",
+        VERSION,
+        "managed",
+        platform != null,
+        "backupOwner",
+        platform == null ? "dailyfortunes" : "manager",
         "lastSuccess",
         lastSuccess,
         "message",
@@ -272,10 +365,19 @@ public final class FortuneBackend implements AutoCloseable {
     UUID uuid = UUID.fromString(id);
     if (!id.equals(playerProof) || !admitted.contains(uuid))
       throw new IllegalArgumentException("玩家尚未通过入服验证");
+    JsonObject identity = null;
+    if (platform != null) {
+      JsonObject context = platformCall(obj("op", "profiles.loginContext", "player", id));
+      if (!b(context, "admitted") || s(context, "eventId").isBlank())
+        throw new IllegalArgumentException("玩家尚未通过统一入服验证");
+      identity = platformProfile(id);
+    }
+    final JsonObject coreIdentity = identity;
     return transaction(
         c -> {
           if (op.equals("login")) {
-            String name = args.get(1).getAsString();
+            String name =
+                coreIdentity == null ? args.get(1).getAsString() : s(coreIdentity, "name");
             if (name.isBlank() || name.length() > 64) throw new IllegalArgumentException("无效玩家名");
             exec(
                 c,
@@ -284,10 +386,11 @@ public final class FortuneBackend implements AutoCloseable {
                 id,
                 name,
                 sortKey(name),
-                System.currentTimeMillis());
+                coreIdentity == null ? System.currentTimeMillis() : l(coreIdentity, "lastSeen"));
             return obj("today", today(c), "settings", settings(c));
           }
-          if (number(c, "SELECT COUNT(*) FROM df_players WHERE uuid=?", id) == 0)
+          if (coreIdentity == null
+              && number(c, "SELECT COUNT(*) FROM df_players WHERE uuid=?", id) == 0)
             throw new IllegalArgumentException("玩家资料尚未加载");
           if (op.equals("calendar")) return calendar(c, id, args.get(1).getAsString());
           if (op.equals("pending"))
@@ -304,7 +407,10 @@ public final class FortuneBackend implements AutoCloseable {
             String day = today(c);
             if (record(c, id, day) != null) throw new IllegalArgumentException("今日已抽过签，可补领原签，不可重抽");
             JsonObject f = choose(fortunes(c), random.nextDouble());
-            String name = scalar(c, "SELECT name FROM df_players WHERE uuid=?", id);
+            String name =
+                coreIdentity == null
+                    ? scalar(c, "SELECT name FROM df_players WHERE uuid=?", id)
+                    : s(coreIdentity, "name");
             JsonObject r =
                 obj(
                     "id",
@@ -456,6 +562,7 @@ public final class FortuneBackend implements AutoCloseable {
   }
 
   private JsonObject profile(Connection c, String id) throws SQLException {
+    if (platform != null) return platformProfile(id);
     try (PreparedStatement p =
             prepare(c, "SELECT uuid,name,last_seen FROM df_players WHERE uuid=?", id);
         ResultSet r = p.executeQuery()) {
@@ -486,7 +593,11 @@ public final class FortuneBackend implements AutoCloseable {
                           "database",
                           true,
                           "version",
-                          "0.1.0",
+                          VERSION,
+                          "managed",
+                          platform != null,
+                          "backupOwner",
+                          platform == null ? "dailyfortunes" : "manager",
                           "lastSuccess",
                           System.currentTimeMillis()),
                       "today",
@@ -494,7 +605,9 @@ public final class FortuneBackend implements AutoCloseable {
                       "counts",
                       obj(
                           "players",
-                          number(c, "SELECT COUNT(*) FROM df_players"),
+                          platform == null
+                              ? number(c, "SELECT COUNT(*) FROM df_players")
+                              : platformProfiles().size(),
                           "records",
                           number(c, "SELECT COUNT(*) FROM df_records")),
                       "pool",
@@ -625,6 +738,7 @@ public final class FortuneBackend implements AutoCloseable {
 
   private JsonObject players(Connection c, Map<String, String> q, Set<UUID> online)
       throws SQLException {
+    if (platform != null) return managedPlayers(c, q, online);
     String onlineIn =
         online.isEmpty()
             ? "''"
@@ -692,6 +806,75 @@ public final class FortuneBackend implements AutoCloseable {
         size,
         "presenceCounts",
         obj("all", all, "online", on, "offline", all - on));
+  }
+
+  private JsonObject managedPlayers(Connection c, Map<String, String> q, Set<UUID> online)
+      throws SQLException {
+    List<JsonObject> profiles = platformProfiles();
+    Map<String, JsonObject> statistics = new HashMap<>();
+    try (PreparedStatement p =
+            prepare(
+                c,
+                "SELECT player,COUNT(*),COALESCE(SUM(state='archived'),0),"
+                    + "COALESCE(SUM(state='unread'),0),MAX(at_ms) FROM df_records GROUP BY player");
+        ResultSet r = p.executeQuery()) {
+      while (r.next())
+        statistics.put(
+            r.getString(1),
+            obj(
+                "total",
+                r.getLong(2),
+                "archived",
+                r.getLong(3),
+                "unread",
+                r.getLong(4),
+                "latestAt",
+                r.getObject(5)));
+    }
+    String presence = q.getOrDefault("presence", "all");
+    String search = q.getOrDefault("q", "").toLowerCase(Locale.ROOT);
+    List<JsonObject> result = new ArrayList<>();
+    int on = 0;
+    for (JsonObject profile : profiles) {
+      String id = s(profile, "id");
+      boolean connected = online.contains(UUID.fromString(id));
+      if (connected) on++;
+      if ((presence.equals("online") && !connected)
+          || (presence.equals("offline") && connected)
+          || !s(profile, "name").toLowerCase(Locale.ROOT).contains(search)) continue;
+      JsonObject row = profile.deepCopy();
+      row.addProperty("online", connected);
+      JsonObject stats =
+          statistics.getOrDefault(
+              id, obj("total", 0, "archived", 0, "unread", 0, "latestAt", null));
+      for (var entry : stats.entrySet()) row.add(entry.getKey(), entry.getValue());
+      result.add(row);
+    }
+    String sort = q.getOrDefault("sort", "status");
+    int direction = q.getOrDefault("direction", "asc").equals("desc") ? -1 : 1;
+    result.sort(
+        (a, b) -> {
+          int cmp;
+          switch (sort) {
+            case "name" -> cmp = sortKey(s(a, "name")).compareTo(sortKey(s(b, "name")));
+            case "total", "archived", "unread" -> cmp = Long.compare(l(a, sort), l(b, sort));
+            case "latest", "latestAt" -> {
+              boolean missingA = a.get("latestAt").isJsonNull(),
+                  missingB = b.get("latestAt").isJsonNull();
+              if (missingA != missingB) return missingA ? 1 : -1;
+              cmp = missingA ? 0 : Long.compare(l(a, "latestAt"), l(b, "latestAt"));
+            }
+            default -> cmp = Boolean.compare(b(b, "online"), b(a, "online"));
+          }
+          if (cmp != 0) return cmp * direction;
+          cmp = sortKey(s(a, "name")).compareTo(sortKey(s(b, "name")));
+          return cmp != 0 ? cmp : s(a, "id").compareTo(s(b, "id"));
+        });
+    JsonObject out = page(result, q);
+    out.add(
+        "presenceCounts",
+        obj("all", profiles.size(), "online", on, "offline", profiles.size() - on));
+    return out;
   }
 
   private JsonObject history(Connection c, Map<String, String> q) throws SQLException {
