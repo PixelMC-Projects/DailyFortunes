@@ -1,0 +1,181 @@
+{
+  "credit": "Original PixelMC Projects art study; AGPL-3.0-only",
+  "textures": {
+    "0": "dailyfortunes:block/fortune_barrel_vanilla16",
+    "particle": "dailyfortunes:block/fortune_barrel_vanilla16"
+  },
+  "texture_size": [
+    64,
+    64
+  ],
+  "ambientocclusion": true,
+  "render_type": "minecraft:cutout",
+  "display": {
+    "gui": {
+      "rotation": [
+        25,
+        35,
+        0
+      ],
+      "translation": [
+        0,
+        -2,
+        0
+      ],
+      "scale": [
+        0.72,
+        0.72,
+        0.72
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        -1,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        1,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -25,
+        0
+      ],
+      "translation": [
+        1,
+        1,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    }
+  },
+  "elements": [
+    {
+      "name": "签 7 / Stick 7",
+      "from": [
+        9.4,
+        6,
+        9.3
+      ],
+      "to": [
+        10.4,
+        19,
+        10.3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#0",
+          "uv": [
+            1.75,
+            0.25,
+            2.0,
+            3.5
+          ]
+        },
+        "south": {
+          "texture": "#0",
+          "uv": [
+            1.75,
+            0.25,
+            2.0,
+            3.5
+          ]
+        },
+        "east": {
+          "texture": "#0",
+          "uv": [
+            1.75,
+            0.25,
+            2.0,
+            3.5
+          ]
+        },
+        "west": {
+          "texture": "#0",
+          "uv": [
+            1.75,
+            0.25,
+            2.0,
+            3.5
+          ]
+        },
+        "up": {
+          "texture": "#0",
+          "uv": [
+            1.0,
+            10.0,
+            1.25,
+            10.25
+          ]
+        },
+        "down": {
+          "texture": "#0",
+          "uv": [
+            1.75,
+            10.0,
+            2.0,
+            10.25
+          ]
+        }
+      },
+      "rotation": {
+        "axis": "z",
+        "angle": -22.5,
+        "origin": [
+          9.9,
+          9,
+          9.8
+        ],
+        "rescale": false
+      }
+    }
+  ]
+}
