@@ -16,7 +16,7 @@ import java.util.function.Function;
 public final class FortuneBackend implements AutoCloseable {
   public static final Gson JSON = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
   public static final List<String> GRADES = List.of("上上签", "上吉签", "中平签", "小凶签", "下下签");
-  public static final String VERSION = "0.2.1";
+  public static final String VERSION = "0.3.0";
   private final String url, user, password;
   private final Path folder;
   private final SecureRandom random = new SecureRandom();

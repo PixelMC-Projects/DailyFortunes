@@ -2,15 +2,8 @@ package cn.pixelmc.dailyfortunes.client;
 
 /** Seven damped, colliding tip particles. No centering spring: settled positions stay put. */
 public final class StickPhysics {
-  public static final double[][] PIVOTS = {
-    {.5026312, .46875, .4298438},
-    {.5601875, .46875, .54345},
-    {.4847938, .46875, .5166063},
-    {.5452375, .46875, .4594313},
-    {.46985, .46875, .5976125},
-    {.5808437, .46875, .421975},
-    {.4294562, .46875, .4875687}
-  };
+  public static final double[][] PIVOTS = ArtProfile.DEFAULT.pivots;
+  public final ArtProfile profile;
   public final double[] x = new double[7],
       z = new double[7],
       y = new double[7],
@@ -19,9 +12,14 @@ public final class StickPhysics {
       vy = new double[7];
 
   public StickPhysics() {
+    this(ArtProfile.DEFAULT);
+  }
+
+  public StickPhysics(ArtProfile profile) {
+    this.profile = profile;
     for (int i = 0; i < 7; i++) {
-      x[i] = PIVOTS[i][0];
-      z[i] = PIVOTS[i][2];
+      x[i] = profile.pivots[i][0];
+      z[i] = profile.pivots[i][2];
     }
   }
 
@@ -74,7 +72,7 @@ public final class StickPhysics {
             double dx = x[j] - x[i],
                 dz = z[j] - z[i],
                 distance = Math.hypot(dx, dz),
-                minimum = .039;
+                minimum = profile.separation;
             if (distance < minimum && distance > 1e-8) {
               double nx = dx / distance, nz = dz / distance, overlap = (minimum - distance) * .5;
               x[i] -= nx * overlap;
@@ -107,11 +105,12 @@ public final class StickPhysics {
   }
 
   private void confine(int i) {
-    double dx = x[i] - PIVOTS[i][0], dz = z[i] - PIVOTS[i][2], r = Math.hypot(dx, dz), limit = .065;
+    double[] pivot = profile.pivots[i], bounds = profile.bounds[i];
+    double dx = x[i] - pivot[0], dz = z[i] - pivot[2], r = Math.hypot(dx, dz), limit = .065;
     if (r > limit) {
       double nx = dx / r, nz = dz / r;
-      x[i] = PIVOTS[i][0] + nx * limit;
-      z[i] = PIVOTS[i][2] + nz * limit;
+      x[i] = pivot[0] + nx * limit;
+      z[i] = pivot[2] + nz * limit;
       double speed = vx[i] * nx + vz[i] * nz;
       if (speed > 0) {
         vx[i] -= nx * speed * 1.22;
@@ -119,12 +118,19 @@ public final class StickPhysics {
       }
     }
     double cx = x[i] - .5, cz = z[i] - .5, wall = Math.hypot(cx, cz);
-    if (wall > .16) {
-      x[i] = .5 + cx / wall * .16;
-      z[i] = .5 + cz / wall * .16;
+    if (profile.roundWall > 0 && wall > profile.roundWall) {
+      x[i] = .5 + cx / wall * profile.roundWall;
+      z[i] = .5 + cz / wall * profile.roundWall;
       vx[i] *= .2;
       vz[i] *= .2;
     }
+    // Bounds are derived from the complete tilted cuboid at the square barrel rim.
+    double nextX = clamp(x[i], pivot[0] + bounds[0], pivot[0] + bounds[1]);
+    double nextZ = clamp(z[i], pivot[2] + bounds[2], pivot[2] + bounds[3]);
+    if (nextX != x[i]) vx[i] *= -.22;
+    if (nextZ != z[i]) vz[i] *= -.22;
+    x[i] = nextX;
+    z[i] = nextZ;
   }
 
   private static double clamp(double v, double min, double max) {

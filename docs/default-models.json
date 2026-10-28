@@ -1,0 +1,39 @@
+{
+  "version": "0.3.0",
+  "default": "vanilla",
+  "optional": "classic",
+  "models": [
+    {
+      "model": "fortune_barrel",
+      "source": "art-prototypes/fortune_barrel_vanilla16/fortune_barrel_vanilla16.bbmodel",
+      "sha256": "ecc167d32266b90a51cb84d036a7e4f13dcad0ded2248da1b770cc2fb25dedde",
+      "quads": 123,
+      "atlas": [
+        64,
+        64
+      ]
+    },
+    {
+      "model": "interpretation_shrine",
+      "source": "art-prototypes/interpretation_shrine_vanilla16/interpretation_shrine_vanilla16.bbmodel",
+      "sha256": "ad9264041f2bccc046caf003410d7c2b6b99f39137d8aaa91434786fea969eda",
+      "quads": 134,
+      "atlas": [
+        128,
+        128
+      ]
+    },
+    {
+      "model": "collection_chest",
+      "source": "art-prototypes/collection_chest_vanilla16/collection_chest_vanilla16.bbmodel",
+      "sha256": "6108ef789999ec2f3e976053f275d77b140841d4be08ac06ba48f8e62c1269bd",
+      "quads": 91,
+      "atlas": [
+        64,
+        64
+      ]
+    }
+  ],
+  "mastersAndPrototypesPreserved": true,
+  "resourcePackAutoEnabled": false
+}

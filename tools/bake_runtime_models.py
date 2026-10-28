@@ -530,5 +530,7 @@ def optimize(stem):
 
 
 if __name__=='__main__':
+    # Legacy baking now targets the optional pack, never the default vanilla art.
+    ASSETS = ROOT / 'resourcepacks/classic/assets/dailyfortunes'
     reports=[optimize(stem) for stem in ('fortune_barrel','interpretation_shrine','collection_chest')]
     (DERIVED/'report.json').write_text(json.dumps(reports,ensure_ascii=False,indent=2),'utf-8')

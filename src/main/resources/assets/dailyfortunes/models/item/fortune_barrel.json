@@ -1,1 +1,3 @@
-{"parent": "dailyfortunes:block/fortune_barrel"}
+{
+  "parent": "dailyfortunes:block/fortune_barrel"
+}

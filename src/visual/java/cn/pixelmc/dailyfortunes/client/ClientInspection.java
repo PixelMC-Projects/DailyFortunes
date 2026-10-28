@@ -111,17 +111,17 @@ public final class ClientInspection extends Screen {
           throw new AssertionError("Air above the cabinet lid must not intercept selection rays");
         double[] drawer =
             switch (facing) {
-              case SOUTH -> new double[] {10.5 / 16, 14.4 / 16};
-              case WEST -> new double[] {1.6 / 16, 10.5 / 16};
-              case NORTH -> new double[] {5.5 / 16, 1.6 / 16};
-              case EAST -> new double[] {14.4 / 16, 5.5 / 16};
+              case SOUTH -> new double[] {10.5 / 16, 13.125 / 16};
+              case WEST -> new double[] {2.875 / 16, 10.5 / 16};
+              case NORTH -> new double[] {5.5 / 16, 2.875 / 16};
+              case EAST -> new double[] {13.125 / 16, 5.5 / 16};
               default -> throw new AssertionError("Unexpected vertical block facing");
             };
         var drawerPoint =
             Shapes.box(
                 drawer[0] - .001, .405, drawer[1] - .001, drawer[0] + .001, .407, drawer[1] + .001);
         if (!Shapes.joinIsNotEmpty(shape, drawerPoint, BooleanOp.AND))
-          throw new AssertionError("The opened drawer must rotate with the rendered model");
+          throw new AssertionError("The shallow drawer front must rotate with the rendered model");
       }
       double current =
           shape.toAabbs().stream()

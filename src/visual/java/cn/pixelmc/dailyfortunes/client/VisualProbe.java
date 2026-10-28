@@ -74,6 +74,11 @@ public final class VisualProbe {
                   "snapshot",
                   f);
         }
+        if (Boolean.getBoolean("dailyfortunes.styles")) {
+          m.setScreen(new StyleInspection(record));
+          phase = 99;
+          return;
+        }
         m.setScreen(new Models());
         phase = 2;
         since = now;

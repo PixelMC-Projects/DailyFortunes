@@ -4,7 +4,7 @@
 
 - 六十篇签文，独立权重；吉凶只用于阅读与收藏，没有奖励或惩罚。
 - 按日期保存个人签历，遗失可补领原签，不能重抽或赠送。
-- 中式木作、植物与小猫模型；签筒内的签会随动作晃动，碰撞后停在新位置。
+- 原版像素风的中式木作与植物模型；签筒内的签会随动作晃动，碰撞后停在新位置。
 - 可在藏签匣上展示收藏，瞄准时阅读；支持 PixelMC Manager 网页管理。
 
 ## 安装与使用
@@ -15,9 +15,11 @@
 
 签筒、解签龛、藏签匣可用竹子、木材、铜、纸等原版材料合成。`/df recover yyyy-MM-dd` 补领已抽取但尚未收藏的原签。打开藏签匣自动收存背包里的已解签笺；左键阅读，右键选择展示，中键清除展示。
 
+喜欢此前的精细木作外观，可下载同版本的 `DailyFortunes-Classic` 资源包，放入 `resourcepacks`，在“选项 → 资源包”手动启用。默认不加载；停用即可恢复原版像素风，签历数据不变。资源包只换外观，碰撞范围以服务器默认模型为准。
+
 ## 服务器与网页
 
-1. 安装 DailyFortunes 0.2.1 与 PixelMC Manager 0.6.0 或兼容新版，部署附件中的 Manager 独立网页服务，并配置其统一 MariaDB 数据库和游戏桥接。
+1. 安装 DailyFortunes 0.3.0 与 PixelMC Manager 0.6.0 或兼容新版，部署附件中的 Manager 独立网页服务，并配置其统一 MariaDB 数据库和游戏桥接。
 2. 在 Manager 服务中启用抽签模块；本模组的 `config/dailyfortunes/server.json` 保持 `mode: auto`。抽签数据注册在 Manager 管理的 `dailyfortunes` 命名空间，玩家与头像使用统一玩家库。
 3. 启动后，Manager 左侧出现“抽签管理”。可编辑签文、查看所有玩家签历、补领、调整设置、备份和撤回单项修改。
 
@@ -30,6 +32,8 @@
 ## English
 
 Draw one fortune each day, interpret it at a wooden shrine, and keep it permanently in your personal archive. Includes 60 poems, custom Chinese-inspired models, constrained stick motion, recoverable receipts and a floating display with a reading panel. Fortune grades are decorative: no rewards or gameplay penalties.
+
+Vanilla-style pixel models are included by default. For the previous detailed artwork, place the matching `DailyFortunes-Classic` ZIP in `resourcepacks` and enable it manually. It is disabled by default; switching styles preserves all data. Collision shapes remain those of the server's default models.
 
 Install on **both sides with Minecraft 1.20.1 / Forge 47.3+**. Singleplayer uses an embedded database automatically. For web management, install Manager 0.6.0 or a compatible newer version, configure its unified MariaDB database and game bridge, enable the fortune module, and keep `mode: auto` in `config/dailyfortunes/server.json`. All known players and avatars come from Manager; fortune history stays in its registered namespace. Without Manager, select `mode: database` and configure standalone MariaDB access.
 

@@ -42,6 +42,7 @@ public final class ModelBenchmark extends Screen {
   public static final class Registration {
     @SubscribeEvent
     public static void models(ModelEvent.RegisterAdditional e) {
+      if (!Boolean.getBoolean("dailyfortunes.benchmark")) return;
       for (String name : NAMES)
         e.register(new ResourceLocation(DailyFortunes.ID, "item/baseline_" + name));
     }

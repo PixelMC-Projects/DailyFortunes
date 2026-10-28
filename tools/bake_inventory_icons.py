@@ -7,7 +7,7 @@ from bake_runtime_models import ROOT, ASSETS, mesh
 from preview_runtime_models import render
 
 for stem in ('fortune_barrel','interpretation_shrine','collection_chest'):
-    master=json.loads((ROOT/'art-source'/f'{stem}.bbmodel').read_text('utf-8'))
+    master=json.loads((ROOT/'art-prototypes'/f'{stem}_vanilla16'/f'{stem}_vanilla16.bbmodel').read_text('utf-8'))
     vertices=np.concatenate([p for e in master['elements'] for p,u,n in mesh(e)])
     pixels=render(master,(.67,.45,1),(vertices.min(axis=0),vertices.max(axis=0)))
     icon=Image.fromarray(pixels).resize((236,256),Image.Resampling.NEAREST)
@@ -19,6 +19,7 @@ for stem in ('fortune_barrel','interpretation_shrine','collection_chest'):
       'display':{'gui':{'rotation':[0,180,0]}}}
     (ASSETS/'models/item'/f'{stem}_gui.json').write_text(json.dumps(quad,separators=(',',':')),'utf-8')
     # The benchmark loads the immutable master as a separate additional model.
+    master=json.loads((ROOT/'art-source'/f'{stem}.bbmodel').read_text('utf-8'))
     test=ROOT/'src/visual/resources/assets/dailyfortunes'
     (test/'models/item').mkdir(parents=True,exist_ok=True);(test/'textures/benchmark').mkdir(parents=True,exist_ok=True)
     source=base64.b64decode(master['textures'][0]['source'].split(',',1)[1])

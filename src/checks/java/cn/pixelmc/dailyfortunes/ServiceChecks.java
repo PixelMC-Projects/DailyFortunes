@@ -130,7 +130,10 @@ public final class ServiceChecks {
             Double.isFinite(physics.x[j])
                 && physics.y[j] >= 0
                 && physics.y[j] <= .0451
-                && Math.hypot(physics.x[j] - .5, physics.z[j] - .5) <= .16001,
+                && physics.x[j] >= physics.profile.pivots[j][0] + physics.profile.bounds[j][0] - 1e-8
+                && physics.x[j] <= physics.profile.pivots[j][0] + physics.profile.bounds[j][1] + 1e-8
+                && physics.z[j] >= physics.profile.pivots[j][2] + physics.profile.bounds[j][2] - 1e-8
+                && physics.z[j] <= physics.profile.pivots[j][2] + physics.profile.bounds[j][3] + 1e-8,
             "confined particle");
     }
     String url = System.getenv("DF_TEST_JDBC");

@@ -42,7 +42,10 @@ public final class FortuneClient {
   public static void reload(RegisterClientReloadListenersEvent e) {
     e.registerReloadListener(
         (net.minecraft.server.packs.resources.ResourceManagerReloadListener)
-            manager -> SlipShape.clear());
+            manager -> {
+              SlipShape.clear();
+              ClientArtProfile.reload(manager);
+            });
   }
 
   @SubscribeEvent
@@ -367,7 +370,9 @@ public final class FortuneClient {
 
   private static final float DISPLAY_SIZE = .50F;
   // Keep the paper's lower edge just above the wooden lid, using the same plane for aiming.
-  private static final double DISPLAY_CENTER_Y = BlockGeometry.CHEST_TOP + .04 + DISPLAY_SIZE / 2;
+  private static double displayCenterY() {
+    return ClientArtProfile.current().chestTop + .04 + DISPLAY_SIZE / 2;
+  }
 
   public static final class DisplayRenderer implements BlockEntityRenderer<ChestEntity> {
     public DisplayRenderer(BlockEntityRendererProvider.Context c) {}
@@ -385,7 +390,7 @@ public final class FortuneClient {
         VISIBLE_CHESTS.remove(VISIBLE_CHESTS.keySet().iterator().next());
       try {
         pose.pushPose();
-        pose.translate(.5, DISPLAY_CENTER_Y, .5);
+        pose.translate(.5, displayCenterY(), .5);
         Direction facing = chest.getBlockState().getValue(FortuneBlock.FACING);
         pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-facing.toYRot()));
         pose.scale(DISPLAY_SIZE, DISPLAY_SIZE, DISPLAY_SIZE);
@@ -480,7 +485,7 @@ public final class FortuneClient {
           continue;
         }
         if (chest.display.isBlank()) continue;
-        Vec3 mid = Vec3.atLowerCornerOf(pos).add(.5, DISPLAY_CENTER_Y, .5);
+        Vec3 mid = Vec3.atLowerCornerOf(pos).add(.5, displayCenterY(), .5);
         if (mid.distanceToSqr(eye) > 49) continue;
         Direction facing = chest.getBlockState().getValue(FortuneBlock.FACING);
         Vec3 normal = Vec3.atLowerCornerOf(facing.getNormal());

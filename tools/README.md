@@ -1,5 +1,15 @@
 # 美术派生工具
 
+## 0.3.0 默认模型与可选精细版
+
+现在默认运行资源来自已认可的 `art-prototypes/*_vanilla16`。执行 `python tools/install_default_art.py` 导出默认模型、物品栏图标、动画尺寸及碰撞轮廓，并生成 `build/distributions/DailyFortunes-Classic-0.3.0.zip`。原始精细蓝本、已优化的 `art-runtime` 和三个原版风格源模型均保留。
+
+`resourcepacks/classic` 是默认禁用的普通资源包源目录，含优化过的372/613/402面精细模型。签筒动画通过 `visuals/model_profile.json` 随资源重载切换，悬浮签高度与准星平面同步。默认方签筒的运动边界依据整个旋转签体与桶口的交界截面计算，包含竖直弹跳；不只约束签尖。
+
+`python tools/check_runtime_assets.py` 同时检查默认三件套与精细版。`gradlew runVisualClient -Pstyles` 在隔离开发客户端验证默认未启用资源包、启用精细版、停用恢复、碰撞与悬浮签位置；需先把生成的 ZIP 放入 `run-visual/resourcepacks`。截图在 `build/verification/art-profiles`。
+
+旧烘焙工具 `bake_runtime_models.py` 的命令行输出已改到可选资源包，不再覆盖默认模型。下方为精细蓝本的历史烘焙说明。
+
 `art-source/` 是只读蓝本；本工具不写该目录，也不写原 FortuneArt 工程。
 
 需要重新导出时，安装 `requirements-art.txt` 后依次执行：

@@ -1,1 +1,181 @@
-{"credit":"Derived runtime bake; immutable masters in art-source","texture_size":[1024,1024],"textures":{"0":"dailyfortunes:block/fortune_barrel","particle":"dailyfortunes:block/fortune_barrel"},"elements":[{"name":"baked-stick-2","from":[7.5117,1.2999999999999998,8.1057],"to":[8.0017,14.5,8.435700000000002],"faces":{"north":{"uv":[4.09375,0.046875,4.1875,2.53125],"texture":"#0"},"south":{"uv":[4.25,0.046875,4.34375,2.53125],"texture":"#0"},"east":{"uv":[4.40625,0.046875,4.46875,2.53125],"texture":"#0"},"west":{"uv":[4.53125,0.046875,4.59375,2.53125],"texture":"#0"},"up":{"uv":[1.828125,8.109375,1.921875,8.171875],"texture":"#0"},"down":{"uv":[1.984375,8.109375,2.078125,8.171875],"texture":"#0"}},"rotation":{"angle":22.5,"axis":"x","origin":[7.7567,7.5,8.2657],"rescale":false}}],"display":{"gui":{"rotation":[25,35,0],"translation":[0,-0.3,0],"scale":[0.94,0.94,0.94]},"ground":{"rotation":[0,0,0],"translation":[0,2.5,0],"scale":[0.5,0.5,0.5]},"fixed":{"rotation":[0,180,0],"translation":[0,0,0],"scale":[0.8,0.8,0.8]},"thirdperson_righthand":{"rotation":[0,0,0],"translation":[0,2,0],"scale":[0.5,0.5,0.5]},"firstperson_righthand":{"rotation":[0,-25,0],"translation":[1,2,0],"scale":[0.65,0.65,0.65]}},"render_type":"minecraft:cutout"}
+{
+  "credit": "Original PixelMC Projects art study; AGPL-3.0-only",
+  "textures": {
+    "0": "dailyfortunes:block/fortune_barrel",
+    "particle": "dailyfortunes:block/fortune_barrel"
+  },
+  "texture_size": [
+    64,
+    64
+  ],
+  "ambientocclusion": true,
+  "render_type": "minecraft:cutout",
+  "display": {
+    "gui": {
+      "rotation": [
+        25,
+        35,
+        0
+      ],
+      "translation": [
+        0,
+        -2,
+        0
+      ],
+      "scale": [
+        0.72,
+        0.72,
+        0.72
+      ]
+    },
+    "ground": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        2,
+        0
+      ],
+      "scale": [
+        0.4,
+        0.4,
+        0.4
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        180,
+        0
+      ],
+      "translation": [
+        0,
+        -1,
+        0
+      ],
+      "scale": [
+        0.65,
+        0.65,
+        0.65
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        1,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.45,
+        0.45
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        -25,
+        0
+      ],
+      "translation": [
+        1,
+        1,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    }
+  },
+  "elements": [
+    {
+      "name": "签 3 / Stick 3",
+      "from": [
+        8.7,
+        6,
+        7.5
+      ],
+      "to": [
+        10.7,
+        20,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#0",
+          "uv": [
+            2.0,
+            0.25,
+            2.5,
+            3.75
+          ]
+        },
+        "south": {
+          "texture": "#0",
+          "uv": [
+            2.0,
+            0.25,
+            2.5,
+            3.75
+          ]
+        },
+        "east": {
+          "texture": "#0",
+          "uv": [
+            3.0,
+            0.25,
+            3.25,
+            3.75
+          ]
+        },
+        "west": {
+          "texture": "#0",
+          "uv": [
+            3.0,
+            0.25,
+            3.25,
+            3.75
+          ]
+        },
+        "up": {
+          "texture": "#0",
+          "uv": [
+            8.5,
+            11.5,
+            9.0,
+            11.75
+          ]
+        },
+        "down": {
+          "texture": "#0",
+          "uv": [
+            9.5,
+            11.5,
+            10.0,
+            11.75
+          ]
+        }
+      },
+      "rotation": {
+        "axis": "z",
+        "angle": -22.5,
+        "origin": [
+          9.7,
+          9.3,
+          8
+        ],
+        "rescale": false
+      }
+    }
+  ]
+}

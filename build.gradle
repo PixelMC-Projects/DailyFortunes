@@ -4,7 +4,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.github.johnrengelman.shadow'
-version='0.2.1'
+version='0.3.0'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-forge-1.20.1' }
 java { toolchain { languageVersion=JavaLanguageVersion.of(17) } }
@@ -44,6 +44,7 @@ minecraft.runs {
   client true
   workingDirectory project.file('run-visual')
   property 'dailyfortunes.benchmark',project.hasProperty('benchmark')?'true':'false'
+  property 'dailyfortunes.styles',project.hasProperty('styles')?'true':'false'
   mods { dailyfortunes { source sourceSets.visual } }
   args '--username','FortuneTester','--width','1280','--height','800'
  }

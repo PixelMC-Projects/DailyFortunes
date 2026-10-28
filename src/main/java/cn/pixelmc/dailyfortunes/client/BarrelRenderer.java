@@ -35,7 +35,7 @@ public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
   private static final LinkedHashMap<String, Motion> MOTIONS = new LinkedHashMap<>(128, .75F, true);
 
   private static final class Motion {
-    final StickPhysics physics = new StickPhysics();
+    final StickPhysics physics = new StickPhysics(ClientArtProfile.current());
     long nanos;
     double vx, vz, vy;
     float yaw, pitch;
@@ -47,6 +47,8 @@ public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
         Minecraft.getInstance().getBlockEntityRenderDispatcher(),
         Minecraft.getInstance().getEntityModels());
   }
+
+  public static void clearMotion() { MOTIONS.clear(); }
 
   public static BarrelRenderer instance() {
     if (instance == null) instance = new BarrelRenderer();
@@ -174,8 +176,8 @@ public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
     for (int i = 0; i < 7; i++) {
       pose.pushPose();
       if (motion != null) {
-        double[] pivot = StickPhysics.PIVOTS[i];
         var phys = motion.physics;
+        double[] pivot = phys.profile.pivots[i];
         pose.translate(pivot[0], pivot[1] + phys.y[i], pivot[2]);
         pose.mulPose(Axis.XP.rotation((float) ((phys.z[i] - pivot[2]) * 3.5)));
         pose.mulPose(Axis.ZP.rotation((float) (-(phys.x[i] - pivot[0]) * 3.5)));
