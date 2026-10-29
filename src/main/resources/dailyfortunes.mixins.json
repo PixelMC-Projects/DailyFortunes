@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "cn.pixelmc.dailyfortunes.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "ItemRendererMixin",
+    "MouseHandlerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

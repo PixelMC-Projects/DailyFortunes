@@ -1,60 +1,39 @@
-buildscript {
- repositories { maven { url='https://maven.aliyun.com/repository/public' }; maven { url='https://maven.minecraftforge.net' }; maven { url='https://maven.aliyun.com/repository/gradle-plugin' }; maven { url='https://plugins.gradle.org/m2/' }; mavenCentral() }
- dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.54'; classpath 'com.github.johnrengelman:shadow:8.1.1' }
+plugins {
+ id 'fabric-loom' version '1.7.4'
+ id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'com.github.johnrengelman.shadow'
-version='0.3.0'
+version='0.3.1'
 group='cn.pixelmc.dailyfortunes'
-base { archivesName='dailyfortunes-forge-1.20.1' }
-java { toolchain { languageVersion=JavaLanguageVersion.of(17) } }
-minecraft {
- mappings channel:'official',version:'1.20.1'
- runs {
-  configureEach { workingDirectory project.file('run'); mods { dailyfortunes { source sourceSets.main } } }
-  client {}
-  server { args '--nogui' }
- }
-}
-repositories { maven { url='https://maven.aliyun.com/repository/public' }; maven { url='https://bmclapi2.bangbang93.com/maven' } }
-repositories.configureEach { repo -> if(repo instanceof MavenArtifactRepository) { if(repo.url.host in ['maven.minecraftforge.net','libraries.minecraft.net']) repo.url='https://bmclapi2.bangbang93.com/maven'; if(repo.url.host in ['repo.maven.apache.org','repo1.maven.org']) repo.url='https://maven.aliyun.com/repository/public' } }
+base { archivesName='dailyfortunes-fabric-1.20.1' }
+java { toolchain { languageVersion=JavaLanguageVersion.of(17) }; withSourcesJar() }
+repositories { maven { url='https://maven.aliyun.com/repository/public' }; mavenCentral() }
 configurations { jdbcDriver; compileOnly.extendsFrom jdbcDriver; runtimeOnly.extendsFrom jdbcDriver }
-dependencies { minecraft 'net.minecraftforge:forge:1.20.1-47.3.33'; jdbcDriver('org.mariadb.jdbc:mariadb-java-client:3.5.6') { transitive=false }; jdbcDriver('com.h2database:h2:2.3.232') { transitive=false } }
-// Relocate embedded JDBC drivers: Titles also bundles MariaDB, and Forge uses named modules.
+dependencies {
+ minecraft 'com.mojang:minecraft:1.20.1'
+ mappings loom.officialMojangMappings()
+ modImplementation 'net.fabricmc:fabric-loader:0.16.14'
+ modImplementation 'net.fabricmc.fabric-api:fabric-api:0.92.6+1.20.1'
+ jdbcDriver('org.mariadb.jdbc:mariadb-java-client:3.5.6') { transitive=false }
+ jdbcDriver('com.h2database:h2:2.3.232') { transitive=false }
+}
+loom { runs { server { programArg '--nogui' } } }
 tasks.named('jar',Jar).configure { archiveClassifier='unshaded-dev'; from('LICENSE','NOTICE','THIRD_PARTY.md') }
 tasks.named('shadowJar').configure {
- archiveClassifier=''
- configurations=[project.configurations.jdbcDriver]
- relocate 'org.mariadb.jdbc', 'cn.pixelmc.dailyfortunes.vendor.mariadb'
- relocate 'org.h2', 'cn.pixelmc.dailyfortunes.vendor.h2'
- mergeServiceFiles()
- exclude 'META-INF/*.SF','META-INF/*.RSA','META-INF/*.DSA','module-info.class','META-INF/versions/**'
+ archiveClassifier='dev'; configurations=[project.configurations.jdbcDriver]
+ relocate 'org.mariadb.jdbc','cn.pixelmc.dailyfortunes.vendor.mariadb'
+ relocate 'org.h2','cn.pixelmc.dailyfortunes.vendor.h2'
+ mergeServiceFiles(); exclude 'META-INF/*.SF','META-INF/*.RSA','META-INF/*.DSA','module-info.class','META-INF/versions/**'
  from('LICENSE','NOTICE','THIRD_PARTY.md')
 }
-reobf { shadowJar {} }
-tasks.named('build') { dependsOn 'reobfShadowJar' }
-tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
+tasks.named('remapJar').configure { dependsOn 'shadowJar'; inputFile=tasks.named('shadowJar').flatMap { it.archiveFile }; archiveClassifier='' }
+tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8'; options.release=17 }
 sourceSets { checks { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath + configurations.jdbcDriver } }
-tasks.register('serviceChecks',JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.ServiceChecks' }
-tasks.named('check') { dependsOn 'serviceChecks' }
-sourceSets { visual { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath } }
-minecraft.runs {
- visualClient {
-  parent minecraft.runs.client
-  client true
-  workingDirectory project.file('run-visual')
-  property 'dailyfortunes.benchmark',project.hasProperty('benchmark')?'true':'false'
-  property 'dailyfortunes.styles',project.hasProperty('styles')?'true':'false'
-  mods { dailyfortunes { source sourceSets.visual } }
-  args '--username','FortuneTester','--width','1280','--height','800'
- }
+['serviceChecks':'ServiceChecks','serviceRegressionChecks':'ServiceRegressionChecks','worldStorageChecks':'WorldStorageChecks','platformIntegrationChecks':'PlatformIntegrationChecks','rpcResponseChecks':'RpcResponseChecks','displaySelectionChecks':'DisplaySelectionChecks'].each { taskName,entry ->
+ tasks.register(taskName,JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.'+entry }
+ tasks.named('check') { dependsOn taskName }
 }
-
-tasks.register("serviceRegressionChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.ServiceRegressionChecks" }
-tasks.named("check") { dependsOn "serviceRegressionChecks" }
-
 tasks.register('packagedStorageChecks',JavaExec) {
- dependsOn 'reobfShadowJar','checksClasses'
+ dependsOn 'shadowJar','checksClasses'
  classpath=files(tasks.named('shadowJar').flatMap { it.archiveFile }) + sourceSets.checks.runtimeClasspath
  mainClass='cn.pixelmc.dailyfortunes.ServiceChecks'
  systemProperty 'dailyfortunes.packaged','true'
@@ -62,14 +41,21 @@ tasks.register('packagedStorageChecks',JavaExec) {
 }
 tasks.named('check') { dependsOn 'packagedStorageChecks' }
 
-tasks.register("worldStorageChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.WorldStorageChecks" }
-tasks.named("check") { dependsOn "worldStorageChecks" }
+// Development-only runtime checks. They are separate from the distributable main JAR.
+sourceSets { smoke { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath } }
+loom { mods { dailyfortunes { sourceSet sourceSets.main }; dailyfortunes_smoke { sourceSet sourceSets.smoke } } }
 
-tasks.register('platformIntegrationChecks',JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.PlatformIntegrationChecks' }
-tasks.named('check') { dependsOn 'platformIntegrationChecks' }
+loom { accessWidenerPath=file('src/main/resources/dailyfortunes.accesswidener') }
 
-tasks.register('rpcResponseChecks',JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.RpcResponseChecks' }
-tasks.named('check') { dependsOn 'rpcResponseChecks' }
+tasks.named('runServer') { standardInput=System.in }
 
-tasks.register('displaySelectionChecks',JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.DisplaySelectionChecks' }
-tasks.named('check') { dependsOn 'displaySelectionChecks' }
+tasks.named('runServer') { dependsOn 'smokeClasses'; classpath += sourceSets.smoke.output; standardInput=System.in }
+tasks.named('runClient') { dependsOn 'smokeClasses'; classpath += sourceSets.smoke.output }
+loom { runs { client { programArgs '--width','1280','--height','800'; vmArg '-Xmx1G' } } }
+
+if(project.hasProperty('flow')) tasks.named('runServer') { jvmArgs '-Ddailyfortunes.flow=true' }
+if(project.hasProperty('connectAddress')) tasks.named('runClient') { jvmArgs '-Ddailyfortunes.connect='+project.property('connectAddress') }
+
+if(project.hasProperty('capture')) tasks.named('runClient') { jvmArgs '-Ddailyfortunes.capture=true' }
+
+loom { runs { client { runDir='run-client' }; server { runDir='run-server' } } }

@@ -24,33 +24,10 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.*;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(
-    modid = DailyFortunes.ID,
-    value = Dist.CLIENT,
-    bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class FortuneClient {
   public static ResourceLocation texture(String path) {
     return new ResourceLocation(DailyFortunes.ID, "textures/" + path + ".png");
-  }
-
-  @SubscribeEvent
-  public static void reload(RegisterClientReloadListenersEvent e) {
-    e.registerReloadListener(
-        (net.minecraft.server.packs.resources.ResourceManagerReloadListener)
-            manager -> {
-              SlipShape.clear();
-              ClientArtProfile.reload(manager);
-            });
-  }
-
-  @SubscribeEvent
-  public static void renderers(EntityRenderersEvent.RegisterRenderers e) {
-    e.registerBlockEntityRenderer(DailyFortunes.CHEST_ENTITY.get(), DisplayRenderer::new);
   }
 
   public static void receive(String type, String json) {
@@ -410,7 +387,7 @@ public final class FortuneClient {
     }
 
     public boolean shouldRenderOffScreen(ChestEntity c) {
-      return false;
+      return !c.display.isBlank();
     }
 
     public int getViewDistance() {
@@ -445,23 +422,20 @@ public final class FortuneClient {
           .endVertex();
   }
 
-  @Mod.EventBusSubscriber(modid = DailyFortunes.ID, value = Dist.CLIENT)
-  public static final class Overlay {
+    public static final class Overlay {
     private static JsonObject hovered;
     private static int scroll;
     private static String key = "";
 
-    @SubscribeEvent
-    public static void scroll(InputEvent.MouseScrollingEvent e) {
+      public static boolean scroll(double delta) {
       if (hovered != null && Minecraft.getInstance().screen == null) {
-        scroll = Math.max(0, scroll - (int) Math.signum(e.getScrollDelta()) * 2);
-        e.setCanceled(true);
+        scroll = Math.max(0, scroll - (int) Math.signum(delta) * 2);
+        return true;
       }
+      return false;
     }
 
-    @SubscribeEvent
-    public static void render(RenderGuiOverlayEvent.Post e) {
-      if (!e.getOverlay().id().equals(new ResourceLocation("minecraft", "crosshair"))) return;
+      public static void render(GuiGraphics graphics) {
       Minecraft mc = Minecraft.getInstance();
       hovered = null;
       if (mc.level == null || mc.player == null) {
@@ -533,7 +507,7 @@ public final class FortuneClient {
                     mc.getWindow().getGuiScaledWidth() - w - 8,
                     mc.getWindow().getGuiScaledWidth() / 2 + 18),
             y = Math.max(5, (mc.getWindow().getGuiScaledHeight() - h) / 2);
-        scroll = panel(e.getGuiGraphics(), x, y, w, h, r, true, scroll);
+        scroll = panel(graphics, x, y, w, h, r, true, scroll);
       } catch (Exception ignored) {
       }
     }

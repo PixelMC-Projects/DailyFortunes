@@ -38,17 +38,6 @@ public final class FortuneItem extends Item {
       stack.getOrCreateTag().putUUID("BarrelId", UUID.randomUUID());
   }
 
-  public void initializeClient(
-      java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions>
-          consumer) {
-    consumer.accept(
-        new net.minecraftforge.client.extensions.common.IClientItemExtensions() {
-          public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
-            return cn.pixelmc.dailyfortunes.client.BarrelRenderer.instance();
-          }
-        });
-  }
-
   public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
     ItemStack stack = p.getItemInHand(hand);
     if (!level.isClientSide && p instanceof ServerPlayer sp) {

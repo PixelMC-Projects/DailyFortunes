@@ -32,11 +32,6 @@ public final class ChestEntity extends BlockEntity {
     return cachedDisplayData;
   }
 
-  @Override
-  public AABB getRenderBoundingBox() {
-    // Include the complete floating paper while still allowing normal frustum culling.
-    return new AABB(worldPosition).expandTowards(0, .25, 0);
-  }
 
   public ChestEntity(BlockPos p, BlockState s) {
     super(DailyFortunes.CHEST_ENTITY.get(), p, s);
