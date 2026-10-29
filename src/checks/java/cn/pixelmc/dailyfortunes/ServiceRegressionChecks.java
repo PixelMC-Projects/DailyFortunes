@@ -308,7 +308,7 @@ public final class ServiceRegressionChecks {
       }
       try (FortuneBackend restored =
           new FortuneBackend(
-              "jdbc:mariadb://127.0.0.1:43317/" + schema,
+              "jdbc:mariadb://127.0.0.1:43322/" + schema,
               "root",
               password,
               fixture.backup().getParent().getParent().resolve(schema))) {
@@ -365,12 +365,12 @@ public final class ServiceRegressionChecks {
     String base = System.getenv("DF_TEST_JDBC");
     if (base == null) {
       System.out.println(
-          "DailyFortunes SQL regression checks require DF_TEST_JDBC on isolated local port 43317");
+          "DailyFortunes SQL regression checks require DF_TEST_JDBC on isolated local port 43322");
       return;
     }
-    if (!base.startsWith("jdbc:mariadb://127.0.0.1:43317/")) {
+    if (!base.startsWith("jdbc:mariadb://127.0.0.1:43322/")) {
       throw new IllegalStateException(
-          "Regression tests are restricted to isolated local port 43317");
+          "Regression tests are restricted to isolated local port 43322");
     }
     Properties properties = new Properties();
     properties.setProperty("user", "root");
@@ -383,7 +383,7 @@ public final class ServiceRegressionChecks {
       }
       try (FortuneBackend service =
           new FortuneBackend(
-              "jdbc:mariadb://127.0.0.1:43317/" + schema,
+              "jdbc:mariadb://127.0.0.1:43322/" + schema,
               "root",
               properties.getProperty("password"),
               folder)) {

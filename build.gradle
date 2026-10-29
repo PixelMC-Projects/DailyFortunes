@@ -1,60 +1,34 @@
-buildscript {
- repositories { maven { url='https://maven.aliyun.com/repository/public' }; maven { url='https://maven.minecraftforge.net' }; maven { url='https://maven.aliyun.com/repository/gradle-plugin' }; maven { url='https://plugins.gradle.org/m2/' }; mavenCentral() }
- dependencies { classpath 'net.minecraftforge.gradle:ForgeGradle:6.0.54'; classpath 'com.github.johnrengelman:shadow:8.1.1' }
-}
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'com.github.johnrengelman.shadow'
-version='0.3.0'
+plugins { id 'net.neoforged.moddev' version '2.0.148'; id 'com.gradleup.shadow' version '8.3.6' }
+version='0.3.1'
 group='cn.pixelmc.dailyfortunes'
-base { archivesName='dailyfortunes-forge-1.20.1' }
-java { toolchain { languageVersion=JavaLanguageVersion.of(17) } }
-minecraft {
- mappings channel:'official',version:'1.20.1'
- runs {
-  configureEach { workingDirectory project.file('run'); mods { dailyfortunes { source sourceSets.main } } }
-  client {}
-  server { args '--nogui' }
- }
+base { archivesName='dailyfortunes-neoforge-1.21.1' }
+java { toolchain { languageVersion=JavaLanguageVersion.of(21) }; withSourcesJar() }
+neoForge {
+ version='21.1.265'
+ runs { client { client(); gameDirectory=file('run-client') }; server { server(); gameDirectory=file('run-server'); programArgument '--nogui' } }
+ mods { dailyfortunes { sourceSet sourceSets.main } }
 }
-repositories { maven { url='https://maven.aliyun.com/repository/public' }; maven { url='https://bmclapi2.bangbang93.com/maven' } }
-repositories.configureEach { repo -> if(repo instanceof MavenArtifactRepository) { if(repo.url.host in ['maven.minecraftforge.net','libraries.minecraft.net']) repo.url='https://bmclapi2.bangbang93.com/maven'; if(repo.url.host in ['repo.maven.apache.org','repo1.maven.org']) repo.url='https://maven.aliyun.com/repository/public' } }
+repositories { maven { url='https://maven.aliyun.com/repository/public' }; mavenCentral() }
 configurations { jdbcDriver; compileOnly.extendsFrom jdbcDriver; runtimeOnly.extendsFrom jdbcDriver }
-dependencies { minecraft 'net.minecraftforge:forge:1.20.1-47.3.33'; jdbcDriver('org.mariadb.jdbc:mariadb-java-client:3.5.6') { transitive=false }; jdbcDriver('com.h2database:h2:2.3.232') { transitive=false } }
-// Relocate embedded JDBC drivers: Titles also bundles MariaDB, and Forge uses named modules.
+dependencies { jdbcDriver('org.mariadb.jdbc:mariadb-java-client:3.5.6') { transitive=false }; jdbcDriver('com.h2database:h2:2.3.232') { transitive=false } }
 tasks.named('jar',Jar).configure { archiveClassifier='unshaded-dev'; from('LICENSE','NOTICE','THIRD_PARTY.md') }
 tasks.named('shadowJar').configure {
- archiveClassifier=''
- configurations=[project.configurations.jdbcDriver]
- relocate 'org.mariadb.jdbc', 'cn.pixelmc.dailyfortunes.vendor.mariadb'
- relocate 'org.h2', 'cn.pixelmc.dailyfortunes.vendor.h2'
- mergeServiceFiles()
- exclude 'META-INF/*.SF','META-INF/*.RSA','META-INF/*.DSA','module-info.class','META-INF/versions/**'
+ archiveClassifier=''; configurations=[project.configurations.jdbcDriver]
+ relocate 'org.mariadb.jdbc','cn.pixelmc.dailyfortunes.vendor.mariadb'
+ relocate 'org.h2','cn.pixelmc.dailyfortunes.vendor.h2'
+ mergeServiceFiles(); exclude 'META-INF/*.SF','META-INF/*.RSA','META-INF/*.DSA','module-info.class','META-INF/versions/**'
  from('LICENSE','NOTICE','THIRD_PARTY.md')
 }
-reobf { shadowJar {} }
-tasks.named('build') { dependsOn 'reobfShadowJar' }
-tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
+tasks.named('build') { dependsOn 'shadowJar' }
+tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8'; options.release=21 }
 sourceSets { checks { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath + configurations.jdbcDriver } }
 tasks.register('serviceChecks',JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.ServiceChecks' }
 tasks.named('check') { dependsOn 'serviceChecks' }
-sourceSets { visual { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath } }
-minecraft.runs {
- visualClient {
-  parent minecraft.runs.client
-  client true
-  workingDirectory project.file('run-visual')
-  property 'dailyfortunes.benchmark',project.hasProperty('benchmark')?'true':'false'
-  property 'dailyfortunes.styles',project.hasProperty('styles')?'true':'false'
-  mods { dailyfortunes { source sourceSets.visual } }
-  args '--username','FortuneTester','--width','1280','--height','800'
- }
-}
-
 tasks.register("serviceRegressionChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.ServiceRegressionChecks" }
 tasks.named("check") { dependsOn "serviceRegressionChecks" }
 
 tasks.register('packagedStorageChecks',JavaExec) {
- dependsOn 'reobfShadowJar','checksClasses'
+ dependsOn 'shadowJar','checksClasses'
  classpath=files(tasks.named('shadowJar').flatMap { it.archiveFile }) + sourceSets.checks.runtimeClasspath
  mainClass='cn.pixelmc.dailyfortunes.ServiceChecks'
  systemProperty 'dailyfortunes.packaged','true'
@@ -73,3 +47,42 @@ tasks.named('check') { dependsOn 'rpcResponseChecks' }
 
 tasks.register('displaySelectionChecks',JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.DisplaySelectionChecks' }
 tasks.named('check') { dependsOn 'displaySelectionChecks' }
+
+
+// Development-only runtime checks. They are separate from the distributable main JAR.
+sourceSets { smoke { compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath } }
+neoForge { mods { dailyfortunes_smoke { sourceSet sourceSets.smoke } } }
+
+tasks.named('runServer') { standardInput=System.in }
+
+neoForge { runs { client { programArgument '--width'; programArgument '1280'; programArgument '--height'; programArgument '800'; jvmArgument '-Xmx1G' } } }
+
+if(project.hasProperty('flow')) neoForge.runs.server { jvmArgument '-Ddailyfortunes.flow=true' }
+if(project.hasProperty('connectAddress')) neoForge.runs.client { jvmArgument '-Ddailyfortunes.connect='+project.property('connectAddress') }
+
+if(project.hasProperty('capture')) neoForge.runs.client { jvmArgument '-Ddailyfortunes.capture=true' }
+
+// NeoForge must receive standalone JDBC libraries on its actual development legacy classpath.
+neoForge.runs.configureEach { additionalRuntimeClasspathConfiguration.extendsFrom(configurations.jdbcDriver) }
+if(project.hasProperty('packaged')) {
+ neoForge.runs.configureEach { loadedMods=[project.neoForge.mods.getByName('dailyfortunes_smoke')]; jvmArgument '-Ddailyfortunes.requirePackaged=true' }
+ tasks.named('runServer') { doFirst { copy { from file('build/libs/dailyfortunes-neoforge-1.21.1-0.3.1.jar'); into file('run-server/mods') } } }
+ tasks.named('runClient') { doFirst { copy { from file('build/libs/dailyfortunes-neoforge-1.21.1-0.3.1.jar'); into file('run-client/mods') } } }
+}
+
+tasks.named('runServer') { dependsOn 'smokeClasses' }
+tasks.named('runClient') { dependsOn 'smokeClasses' }
+
+neoForge {
+ runs {
+  packagedFlowServer {
+   server(); gameDirectory=file('run-server'); programArgument '--nogui'
+   loadedMods=[project.neoForge.mods.getByName('dailyfortunes_smoke')]
+   jvmArgument '-Ddailyfortunes.requirePackaged=true'; jvmArgument '-Ddailyfortunes.flow=true'
+  }
+ }
+}
+tasks.named('runPackagedFlowServer') {
+ dependsOn 'smokeClasses'; standardInput=System.in
+ doFirst { copy { from file('build/libs/dailyfortunes-neoforge-1.21.1-0.3.1.jar'); into file('run-server/mods') } }
+}

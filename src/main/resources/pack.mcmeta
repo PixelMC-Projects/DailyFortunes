@@ -1,1 +1,6 @@
-{"pack":{"pack_format":15,"description":"DailyFortunes approved art"}}
+{
+  "pack": {
+    "pack_format": 34,
+    "description": "DailyFortunes approved art"
+  }
+}

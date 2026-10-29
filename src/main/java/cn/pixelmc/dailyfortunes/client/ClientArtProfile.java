@@ -14,7 +14,7 @@ public final class ClientArtProfile {
 
   public static void reload(ResourceManager manager) {
     ArtProfile next = ArtProfile.DEFAULT;
-    try (var reader = manager.getResourceOrThrow(new ResourceLocation("dailyfortunes", "visuals/model_profile.json")).openAsReader()) {
+    try (var reader = manager.getResourceOrThrow(ResourceLocation.fromNamespaceAndPath("dailyfortunes", "visuals/model_profile.json")).openAsReader()) {
       next = ArtProfile.read(reader);
     } catch (Exception error) {
       LogUtils.getLogger().warn("Invalid DailyFortunes art profile; using default dimensions", error);

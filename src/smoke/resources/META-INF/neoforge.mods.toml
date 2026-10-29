@@ -1,0 +1,7 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="AGPL-3.0-only"
+[[mods]]
+modId="dailyfortunes_smoke"
+version="1.0.0"
+displayName="DailyFortunes isolated runtime checks"

@@ -26,6 +26,10 @@ public final class FortuneBlock extends BaseEntityBlock {
     registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
   }
 
+  protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+    return com.mojang.serialization.MapCodec.unit(this);
+  }
+
   protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) {
     b.add(FACING);
   }
@@ -72,11 +76,20 @@ public final class FortuneBlock extends BaseEntityBlock {
     }
   }
 
-  public InteractionResult use(
-      BlockState s, Level l, BlockPos pos, Player p, InteractionHand hand, BlockHitResult hit) {
+  @Override
+  protected net.minecraft.world.ItemInteractionResult useItemOn(
+      ItemStack item, BlockState s, Level l, BlockPos pos, Player p, InteractionHand hand, BlockHitResult hit) {
+    if (!l.isClientSide && p instanceof ServerPlayer sp) {
+      if (chest) GameRuntime.open(sp, pos); else GameRuntime.resolve(sp, item);
+    }
+    return net.minecraft.world.ItemInteractionResult.sidedSuccess(l.isClientSide);
+  }
+
+  protected InteractionResult useWithoutItem(
+      BlockState s, Level l, BlockPos pos, Player p, BlockHitResult hit) {
     if (!l.isClientSide && p instanceof ServerPlayer sp) {
       if (chest) GameRuntime.open(sp, pos);
-      else GameRuntime.resolve(sp, p.getItemInHand(hand));
+      else GameRuntime.resolve(sp, p.getMainHandItem());
     }
     return InteractionResult.sidedSuccess(l.isClientSide);
   }

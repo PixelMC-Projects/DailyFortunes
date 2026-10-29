@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="AGPL-3.0-only"
+[[mods]]
+modId="dailyfortunes"
+version="0.3.1"
+displayName="DailyFortunes"
+authors="zhan_cpu / PixelMC Projects"
+description='''每日一签 / Daily fortunes, interpretation and permanent collections.'''
+[[dependencies.dailyfortunes]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.0,)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.dailyfortunes]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH"

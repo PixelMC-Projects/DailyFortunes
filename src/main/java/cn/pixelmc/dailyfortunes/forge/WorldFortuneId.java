@@ -17,7 +17,7 @@ public final class WorldFortuneId extends SavedData {
     this.id = id;
   }
 
-  public static WorldFortuneId load(CompoundTag tag) {
+  public static WorldFortuneId load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider lookup) {
     return tag.hasUUID("WorldId")
         ? new WorldFortuneId(tag.getUUID("WorldId"))
         : new WorldFortuneId();
@@ -28,7 +28,7 @@ public final class WorldFortuneId extends SavedData {
   }
 
   @Override
-  public CompoundTag save(CompoundTag tag) {
+  public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider lookup) {
     tag.putUUID("WorldId", id);
     return tag;
   }

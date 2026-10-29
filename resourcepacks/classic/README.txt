@@ -1,6 +1,6 @@
 DailyFortunes Classic / 精细木作可选资源包
 
-Minecraft 1.20.1, DailyFortunes 0.3.0 or compatible newer version.
+Minecraft 1.21.1, DailyFortunes 0.3.1 or compatible newer version.
 此包保留此前优化过的精细签筒、解签龛、藏签匣，默认不启用。
 将 ZIP 放入 resourcepacks，在“选项 → 资源包”手动移到已选列表即可。
 移回可用列表会恢复模组自带的原版像素风。启用/停用均不改变签历或数据库。
