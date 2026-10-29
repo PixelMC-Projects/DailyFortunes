@@ -20,7 +20,7 @@
     }
   },
   "result": {
-    "item": "dailyfortunes:interpretation_shrine",
-    "count": 1
+    "count": 1,
+    "id": "dailyfortunes:interpretation_shrine"
   }
 }

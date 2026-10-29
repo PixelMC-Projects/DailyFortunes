@@ -24,33 +24,10 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.*;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(
-    modid = DailyFortunes.ID,
-    value = Dist.CLIENT,
-    bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class FortuneClient {
   public static ResourceLocation texture(String path) {
-    return new ResourceLocation(DailyFortunes.ID, "textures/" + path + ".png");
-  }
-
-  @SubscribeEvent
-  public static void reload(RegisterClientReloadListenersEvent e) {
-    e.registerReloadListener(
-        (net.minecraft.server.packs.resources.ResourceManagerReloadListener)
-            manager -> {
-              SlipShape.clear();
-              ClientArtProfile.reload(manager);
-            });
-  }
-
-  @SubscribeEvent
-  public static void renderers(EntityRenderersEvent.RegisterRenderers e) {
-    e.registerBlockEntityRenderer(DailyFortunes.CHEST_ENTITY.get(), DisplayRenderer::new);
+    return ResourceLocation.fromNamespaceAndPath(DailyFortunes.ID, "textures/" + path + ".png");
   }
 
   public static void receive(String type, String json) {
@@ -97,6 +74,8 @@ public final class FortuneClient {
   }
 
   public static final class ReadingScreen extends Screen {
+    // Screen.render now draws a background; draw it once before our custom paper.
+    @Override public void renderBackground(GuiGraphics g, int mx, int my, float pt) {}
     private final JsonObject record;
     private final Screen parent;
     private int scroll;
@@ -123,7 +102,7 @@ public final class FortuneClient {
       minecraft.setScreen(parent instanceof CalendarScreen ? parent : null);
     }
 
-    public boolean mouseScrolled(double x, double y, double delta) {
+    public boolean mouseScrolled(double x, double y, double horizontal, double delta) {
       scroll = Math.max(0, scroll - (int) Math.signum(delta) * 2);
       return true;
     }
@@ -157,7 +136,7 @@ public final class FortuneClient {
     }
 
     public void render(GuiGraphics g, int mx, int my, float pt) {
-      renderBackground(g);
+      super.renderBackground(g, mx, my, pt);
       int w = Math.min(560, width - 20), h = w * 2 / 3;
       scroll = panel(g, (width - w) / 2, (height - h) / 2, w, h, record, false, scroll);
       super.render(g, mx, my, pt);
@@ -251,6 +230,7 @@ public final class FortuneClient {
   }
 
   public static final class CalendarScreen extends Screen {
+    @Override public void renderBackground(GuiGraphics g, int mx, int my, float pt) {}
     private JsonObject data;
     private YearMonth month;
     private Map<String, JsonObject> records = new HashMap<>();
@@ -284,7 +264,7 @@ public final class FortuneClient {
     }
 
     public void render(GuiGraphics g, int mx, int my, float pt) {
-      renderBackground(g);
+      super.renderBackground(g, mx, my, pt);
       int x = width / 2 - 144, y = height / 2 - 106;
       art(g, texture("gui/fortune_page_background"), width / 2 - 193, y - 33, 386, 270);
       String heading = month.toString().replace('-', '/');
@@ -397,10 +377,10 @@ public final class FortuneClient {
         var mc = Minecraft.getInstance();
         TextureAtlasSprite paper =
             mc.getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
-                .apply(new ResourceLocation("dailyfortunes", "item/fortune_slip"));
+                .apply(ResourceLocation.fromNamespaceAndPath("dailyfortunes", "item/fortune_slip"));
         TextureAtlasSprite outline =
             mc.getModelManager()
-                .getModel(new ResourceLocation("dailyfortunes", "item/fortune_slip_outline"))
+                .getModel(ResourceLocation.fromNamespaceAndPath("dailyfortunes", "item/fortune_slip_outline"))
                 .getParticleIcon();
         paperQuad(pose, buffers, outline, .001F, 15728880, overlay);
         paperQuad(pose, buffers, paper, 0, light, overlay);
@@ -410,7 +390,7 @@ public final class FortuneClient {
     }
 
     public boolean shouldRenderOffScreen(ChestEntity c) {
-      return false;
+      return !c.display.isBlank();
     }
 
     public int getViewDistance() {
@@ -436,32 +416,28 @@ public final class FortuneClient {
       {sprite.getU0(), sprite.getV0()}
     };
     for (int i = 0; i < 4; i++)
-      v.vertex(matrix, positions[i][0], positions[i][1], z)
-          .color(255, 255, 255, 255)
-          .uv(uv[i][0], uv[i][1])
-          .overlayCoords(overlay)
-          .uv2(light)
-          .normal(normal, 0, 0, 1)
-          .endVertex();
+      v.addVertex(matrix, positions[i][0], positions[i][1], z)
+          .setColor(255, 255, 255, 255)
+          .setUv(uv[i][0], uv[i][1])
+          .setOverlay(overlay)
+          .setLight(light)
+          .setNormal(pose.last(), 0, 0, 1);
   }
 
-  @Mod.EventBusSubscriber(modid = DailyFortunes.ID, value = Dist.CLIENT)
-  public static final class Overlay {
+    public static final class Overlay {
     private static JsonObject hovered;
     private static int scroll;
     private static String key = "";
 
-    @SubscribeEvent
-    public static void scroll(InputEvent.MouseScrollingEvent e) {
+      public static boolean scroll(double delta) {
       if (hovered != null && Minecraft.getInstance().screen == null) {
-        scroll = Math.max(0, scroll - (int) Math.signum(e.getScrollDelta()) * 2);
-        e.setCanceled(true);
+        scroll = Math.max(0, scroll - (int) Math.signum(delta) * 2);
+        return true;
       }
+      return false;
     }
 
-    @SubscribeEvent
-    public static void render(RenderGuiOverlayEvent.Post e) {
-      if (!e.getOverlay().id().equals(new ResourceLocation("minecraft", "crosshair"))) return;
+      public static void render(GuiGraphics graphics) {
       Minecraft mc = Minecraft.getInstance();
       hovered = null;
       if (mc.level == null || mc.player == null) {
@@ -533,7 +509,7 @@ public final class FortuneClient {
                     mc.getWindow().getGuiScaledWidth() - w - 8,
                     mc.getWindow().getGuiScaledWidth() / 2 + 18),
             y = Math.max(5, (mc.getWindow().getGuiScaledHeight() - h) / 2);
-        scroll = panel(e.getGuiGraphics(), x, y, w, h, r, true, scroll);
+        scroll = panel(graphics, x, y, w, h, r, true, scroll);
       } catch (Exception ignored) {
       }
     }

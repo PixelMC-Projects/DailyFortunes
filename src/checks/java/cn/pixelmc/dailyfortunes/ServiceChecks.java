@@ -142,8 +142,8 @@ public final class ServiceChecks {
           "DailyFortunes pure checks passed: " + checks + "; SQL checks require DF_TEST_JDBC");
       return;
     }
-    if (!url.startsWith("jdbc:mariadb://127.0.0.1:43317/"))
-      throw new IllegalStateException("Tests restricted to isolated local port43317");
+    if (!url.startsWith("jdbc:mariadb://127.0.0.1:43322/"))
+      throw new IllegalStateException("Tests restricted to isolated local port43322");
     String schema = "df_check_" + UUID.randomUUID().toString().replace("-", "");
     Properties props = new Properties();
     props.setProperty("user", "root");
@@ -155,7 +155,7 @@ public final class ServiceChecks {
       Path folder = Path.of("build/checks", schema);
       UUID player = UUID.randomUUID(), other = UUID.randomUUID();
       try {
-        String dburl = "jdbc:mariadb://127.0.0.1:43317/" + schema;
+        String dburl = "jdbc:mariadb://127.0.0.1:43322/" + schema;
         try (FortuneBackend service = new FortuneBackend(dburl, "root", "", folder)) {
           JsonObject state = web(service, "GET", "/state", obj(), Map.of());
           check(i(state.getAsJsonObject("pool"), "active") == 60, "60 defaults");

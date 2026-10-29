@@ -19,17 +19,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.*;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.FMLPaths;
 
-@Mod.EventBusSubscriber(modid = DailyFortunes.ID)
 public final class GameRuntime {
+  public static void register() {
+    net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(GameRuntime::start);
+    net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPING.register(GameRuntime::stopping);
+    net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(GameRuntime::tick);
+    net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.JOIN.register((h,s,server)->login(h.player));
+    net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.DISCONNECT.register((h,server)->logout(h.player));
+    net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback.EVENT.register((d,a,e)->commands(d));
+  }
   private static GameRuntime current;
   private final MinecraftServer server;
   private final Set<UUID> registered = new HashSet<>(), busy = new HashSet<>();
@@ -58,15 +57,14 @@ public final class GameRuntime {
     this.server = server;
   }
 
-  @SubscribeEvent
-  public static void start(ServerStartedEvent e) {
-    current = new GameRuntime(e.getServer());
+  public static void start(MinecraftServer server) {
+    current = new GameRuntime(server);
     current.initialize();
   }
 
   private void initialize() {
     try {
-      Path dir = FMLPaths.CONFIGDIR.get().resolve("dailyfortunes");
+      Path dir = net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().resolve("dailyfortunes");
       Files.createDirectories(dir);
       Path path = dir.resolve("server.json");
       if (!Files.exists(path))
@@ -95,7 +93,7 @@ public final class GameRuntime {
                 .overworld()
                 .getDataStorage()
                 .computeIfAbsent(
-                    WorldFortuneId::load, WorldFortuneId::new, "dailyfortunes_identity");
+                    new net.minecraft.world.level.saveddata.SavedData.Factory<>(WorldFortuneId::new,WorldFortuneId::load,null), "dailyfortunes_identity");
         Path local = dir.resolve("local-data/worlds").resolve(identity.id().toString());
         backend =
             new FortuneBackend(
@@ -125,8 +123,7 @@ public final class GameRuntime {
     }
   }
 
-  @SubscribeEvent
-  public static void stopping(ServerStoppingEvent e) {
+  public static void stopping(MinecraftServer server) {
     if (current == null) return;
     current.stopped = true;
     current.io.shutdown();
@@ -135,7 +132,6 @@ public final class GameRuntime {
   }
 
   private static boolean real(ServerPlayer p) {
-    if (p instanceof FakePlayer) return false;
     for (Class<?> type = p.getClass(); type != null; type = type.getSuperclass()) {
       String name = type.getName().toLowerCase(Locale.ROOT);
       if (name.contains("fakeplayer")
@@ -145,16 +141,14 @@ public final class GameRuntime {
     return true;
   }
 
-  @SubscribeEvent
-  public static void login(PlayerEvent.PlayerLoggedInEvent e) {
-    if (current != null && e.getEntity() instanceof ServerPlayer p && real(p))
+  public static void login(ServerPlayer p) {
+    if (current != null && real(p))
       current.next.put(p.getUUID(), System.currentTimeMillis() + 10000);
   }
 
-  @SubscribeEvent
-  public static void logout(PlayerEvent.PlayerLoggedOutEvent e) {
+  public static void logout(ServerPlayer p) {
     if (current != null) {
-      UUID id = e.getEntity().getUUID();
+      UUID id = p.getUUID();
       current.registered.remove(id);
       current.busy.remove(id);
       current.next.remove(id);
@@ -163,10 +157,9 @@ public final class GameRuntime {
     }
   }
 
-  @SubscribeEvent
-  public static void tick(TickEvent.ServerTickEvent e) {
+  public static void tick(MinecraftServer server) {
     GameRuntime r = current;
-    if (r == null || e.phase != TickEvent.Phase.END) return;
+    if (r == null) return;
     long now = System.currentTimeMillis();
     if (now < r.tickAt) return;
     r.tickAt = now + 1000;
@@ -477,9 +470,8 @@ public final class GameRuntime {
     }
   }
 
-  @SubscribeEvent
-  public static void commands(RegisterCommandsEvent e) {
-    e.getDispatcher()
+  public static void commands(com.mojang.brigadier.CommandDispatcher<net.minecraft.commands.CommandSourceStack> dispatcher) {
+    dispatcher
         .register(
             Commands.literal("df")
                 .executes(

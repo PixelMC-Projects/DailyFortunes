@@ -13,7 +13,7 @@ public final class WorldStorageChecks {
     WorldFortuneId first = new WorldFortuneId(), second = new WorldFortuneId();
     if (first.id().equals(second.id()))
       throw new AssertionError("New saves must have different identities");
-    if (!WorldFortuneId.load(first.save(new CompoundTag())).id().equals(first.id()))
+    if (!WorldFortuneId.load(first.save(new CompoundTag(),null),null).id().equals(first.id()))
       throw new AssertionError("Reloading or moving a save must preserve identity");
     Path root = Path.of("build/checks/world-isolation-" + UUID.randomUUID()).toAbsolutePath();
     UUID player = UUID.randomUUID();

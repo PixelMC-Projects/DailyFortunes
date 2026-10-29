@@ -22,7 +22,7 @@ public final class SlipShape {
       try (var stream =
               Minecraft.getInstance()
                   .getResourceManager()
-                  .open(new ResourceLocation("dailyfortunes", "slip-mask.bin"));
+                  .open(ResourceLocation.fromNamespaceAndPath("dailyfortunes", "slip-mask.bin"));
           var data = new DataInputStream(stream)) {
         width = data.readUnsignedShort();
         height = data.readUnsignedShort();

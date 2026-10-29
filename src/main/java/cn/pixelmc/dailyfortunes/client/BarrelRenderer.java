@@ -11,25 +11,16 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.*;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.model.BakedModelWrapper;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(
-    modid = DailyFortunes.ID,
-    value = Dist.CLIENT,
-    bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
   private static BarrelRenderer instance;
   private static final ResourceLocation SHELL =
-      new ResourceLocation(DailyFortunes.ID, "item/barrel_shell");
+      ResourceLocation.fromNamespaceAndPath(DailyFortunes.ID, "item/barrel_shell");
   private static final ResourceLocation[] STICKS = new ResourceLocation[7];
 
   static {
     for (int i = 0; i < 7; i++)
-      STICKS[i] = new ResourceLocation(DailyFortunes.ID, "item/barrel_stick_" + i);
+      STICKS[i] = ResourceLocation.fromNamespaceAndPath(DailyFortunes.ID, "item/barrel_stick_" + i);
   }
 
   private static final LinkedHashMap<String, Motion> MOTIONS = new LinkedHashMap<>(128, .75F, true);
@@ -55,63 +46,16 @@ public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
     return instance;
   }
 
-  @SubscribeEvent
-  public static void models(ModelEvent.RegisterAdditional e) {
-    e.register(SHELL);
-    for (var model : STICKS) e.register(model);
+  public static final java.util.List<ResourceLocation> MODELS = new java.util.ArrayList<>();
+  static {
+    MODELS.add(SHELL);java.util.Collections.addAll(MODELS,STICKS);
+    for(String name:new String[]{"fortune_barrel","interpretation_shrine","collection_chest"}) MODELS.add(ResourceLocation.fromNamespaceAndPath(DailyFortunes.ID,"item/"+name+"_gui"));
+    MODELS.add(ResourceLocation.fromNamespaceAndPath(DailyFortunes.ID,"item/fortune_slip_outline"));
   }
-
-  private static final String[] ITEM_NAMES = {
-    "fortune_barrel", "interpretation_shrine", "collection_chest"
-  };
-
-  @SubscribeEvent
-  public static void guiModels(ModelEvent.RegisterAdditional e) {
-    for (String name : ITEM_NAMES)
-      e.register(new ResourceLocation(DailyFortunes.ID, "item/" + name + "_gui"));
-    e.register(new ResourceLocation(DailyFortunes.ID, "item/fortune_slip_outline"));
-  }
-
-  @SubscribeEvent
-  public static void baked(ModelEvent.ModifyBakingResult e) {
-    for (String name : ITEM_NAMES) {
-      var key =
-          new ModelResourceLocation(new ResourceLocation(DailyFortunes.ID, name), "inventory");
-      BakedModel original = e.getModels().get(key);
-      BakedModel gui =
-          e.getModels().get(new ResourceLocation(DailyFortunes.ID, "item/" + name + "_gui"));
-      if (original == null || gui == null) continue;
-      boolean barrel = name.equals("fortune_barrel");
-      e.getModels()
-          .put(
-              key,
-              new BakedModelWrapper<>(original) {
-                @Override
-                public boolean isCustomRenderer() {
-                  return barrel;
-                }
-
-                @Override
-                public boolean usesBlockLight() {
-                  return false;
-                }
-
-                @Override
-                public BakedModel applyTransform(
-                    ItemDisplayContext context, PoseStack pose, boolean leftHand) {
-                  if (context == ItemDisplayContext.GUI)
-                    return gui.applyTransform(context, pose, leftHand);
-                  original.applyTransform(context, pose, leftHand);
-                  return this;
-                }
-              });
-    }
-  }
-
   private static boolean sameBarrel(ItemStack stack, String id) {
-    return stack.hasTag()
-        && stack.getTag().hasUUID("BarrelId")
-        && stack.getTag().getUUID("BarrelId").toString().equals(id);
+    return stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)
+        && cn.pixelmc.dailyfortunes.forge.ItemData.tag(stack).hasUUID("BarrelId")
+        && cn.pixelmc.dailyfortunes.forge.ItemData.tag(stack).getUUID("BarrelId").toString().equals(id);
   }
 
   // Item.initializeClient runs during its superclass constructor; registration is unconditional.
@@ -134,8 +78,8 @@ public final class BarrelRenderer extends BlockEntityWithoutLevelRenderer {
             || context == ItemDisplayContext.THIRD_PERSON_LEFT_HAND
             || context == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
     String key =
-        stack.hasTag() && stack.getTag().hasUUID("BarrelId")
-            ? stack.getTag().getUUID("BarrelId").toString()
+        stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA) && cn.pixelmc.dailyfortunes.forge.ItemData.tag(stack).hasUUID("BarrelId")
+            ? cn.pixelmc.dailyfortunes.forge.ItemData.tag(stack).getUUID("BarrelId").toString()
             : "";
     Motion motion = null;
     if (hand

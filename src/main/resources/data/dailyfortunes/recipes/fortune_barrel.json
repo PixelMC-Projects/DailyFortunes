@@ -1,1 +1,0 @@
-{"type": "minecraft:crafting_shaped", "pattern": ["B B", "BPB", " S "], "key": {"B": {"item": "minecraft:bamboo"}, "P": {"tag": "minecraft:planks"}, "S": {"tag": "minecraft:wooden_slabs"}}, "result": {"item": "dailyfortunes:fortune_barrel", "count": 1}}

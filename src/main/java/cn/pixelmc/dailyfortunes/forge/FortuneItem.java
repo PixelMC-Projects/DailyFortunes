@@ -34,19 +34,8 @@ public final class FortuneItem extends Item {
       net.minecraft.world.entity.Entity entity,
       int slot,
       boolean selected) {
-    if (kind == Kind.BARREL && !level.isClientSide && !stack.getOrCreateTag().hasUUID("BarrelId"))
-      stack.getOrCreateTag().putUUID("BarrelId", UUID.randomUUID());
-  }
-
-  public void initializeClient(
-      java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions>
-          consumer) {
-    consumer.accept(
-        new net.minecraftforge.client.extensions.common.IClientItemExtensions() {
-          public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
-            return cn.pixelmc.dailyfortunes.client.BarrelRenderer.instance();
-          }
-        });
+    if (kind == Kind.BARREL && !level.isClientSide && !ItemData.tag(stack).hasUUID("BarrelId"))
+      ItemData.update(stack,t->t.putUUID("BarrelId",UUID.randomUUID()));
   }
 
   public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
@@ -61,8 +50,8 @@ public final class FortuneItem extends Item {
 
   public static JsonObject receipt(ItemStack s) {
     try {
-      if (!s.hasTag()) return null;
-      String json = s.getTag().getString("DailyFortunes");
+      if (!s.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)) return null;
+      String json = ItemData.tag(s).getString("DailyFortunes");
       if (json.length() > 16384) return null;
       return JsonParser.parseString(json).getAsJsonObject();
     } catch (Exception e) {
@@ -74,7 +63,7 @@ public final class FortuneItem extends Item {
     ItemStack item =
         new ItemStack(
             s(r, "state").equals("unread") ? DailyFortunes.UNREAD.get() : DailyFortunes.SLIP.get());
-    item.getOrCreateTag().putString("DailyFortunes", JSON.toJson(r));
+    ItemData.update(item,t->t.putString("DailyFortunes",JSON.toJson(r)));
     return item;
   }
 
@@ -102,7 +91,7 @@ public final class FortuneItem extends Item {
   }
 
   public void appendHoverText(
-      ItemStack stack, @Nullable Level level, List<Component> lines, TooltipFlag flag) {
+      ItemStack stack, Item.TooltipContext context, List<Component> lines, TooltipFlag flag) {
     JsonObject r = receipt(stack);
     if (r == null) {
       if (kind == Kind.BARREL)

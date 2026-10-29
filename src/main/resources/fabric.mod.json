@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "dailyfortunes",
+  "version": "0.3.1",
+  "name": "DailyFortunes",
+  "description": "每日一签 / Daily fortunes, interpretation and permanent collections.",
+  "authors": [
+    "zhan_cpu / PixelMC Projects"
+  ],
+  "license": "AGPL-3.0-only",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "cn.pixelmc.dailyfortunes.DailyFortunes"
+    ],
+    "client": [
+      "cn.pixelmc.dailyfortunes.client.FabricClient"
+    ]
+  },
+  "mixins": [
+    "dailyfortunes.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "accessWidener": "dailyfortunes.accesswidener"
+}

@@ -32,31 +32,26 @@ public final class ChestEntity extends BlockEntity {
     return cachedDisplayData;
   }
 
-  @Override
-  public AABB getRenderBoundingBox() {
-    // Include the complete floating paper while still allowing normal frustum culling.
-    return new AABB(worldPosition).expandTowards(0, .25, 0);
-  }
 
   public ChestEntity(BlockPos p, BlockState s) {
     super(DailyFortunes.CHEST_ENTITY.get(), p, s);
   }
 
-  protected void saveAdditional(CompoundTag t) {
-    super.saveAdditional(t);
+  protected void saveAdditional(CompoundTag t, net.minecraft.core.HolderLookup.Provider lookup) {
+    super.saveAdditional(t,lookup);
     if (owner != null) t.putUUID("Owner", owner);
     t.putString("Display", display);
   }
 
-  public void load(CompoundTag t) {
-    super.load(t);
+  public void loadAdditional(CompoundTag t, net.minecraft.core.HolderLookup.Provider lookup) {
+    super.loadAdditional(t,lookup);
     owner = t.hasUUID("Owner") ? t.getUUID("Owner") : null;
     display = t.getString("Display");
     if (display.length() > 16384) display = "";
   }
 
-  public CompoundTag getUpdateTag() {
-    return saveWithoutMetadata();
+  public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider lookup) {
+    return saveWithoutMetadata(lookup);
   }
 
   public ClientboundBlockEntityDataPacket getUpdatePacket() {
