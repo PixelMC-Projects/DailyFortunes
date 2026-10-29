@@ -7,6 +7,17 @@
 - 原版像素风的中式木作与植物模型；签筒内的签会随动作晃动，碰撞后停在新位置。
 - 可在藏签匣上展示收藏，瞄准时阅读；支持 PixelMC Manager 网页管理。
 
+## 支持版本 / Supported versions
+
+| Minecraft | Loader | Mod | Branch |
+| --- | --- | --- | --- |
+| 1.20.1 | Forge 47.3+ | 0.3.0 | [forge/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/forge/1.20.1) |
+| 1.20.1 | Fabric Loader 0.16.14+ + Fabric API | 0.3.1 | [fabric/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.20.1) |
+| 1.21.1 | Fabric Loader 0.16.14+ + Fabric API | 0.3.1 | [fabric/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.21.1) |
+| 1.21.1 | NeoForge 21.1+ | 0.3.1 | [neoforge/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/neoforge/1.21.1) |
+
+从 [Releases](https://github.com/PixelMC-Projects/DailyFortunes/releases) 下载匹配游戏和加载器的 JAR；所有版本均须客户端与服务端同时安装。1.20.1 使用 Java 17，1.21.1 使用 Java 21。Classic ZIP 也须匹配游戏版本，独立下载并手动启用。
+
 ## 安装与使用
 
 **Minecraft 1.20.1 / Forge 47.3+，客户端和服务端都需要安装。** 从 [Releases](https://github.com/PixelMC-Projects/DailyFortunes/releases) 下载对应版本。
