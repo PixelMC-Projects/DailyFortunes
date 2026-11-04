@@ -29,10 +29,11 @@ public final class GameRuntime {
     net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.DISCONNECT.register((h,server)->logout(h.player));
     net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback.EVENT.register((d,a,e)->commands(d));
   }
-  private static GameRuntime current;
+  private static volatile GameRuntime current;
   private final MinecraftServer server;
   private final Set<UUID> registered = new HashSet<>(), busy = new HashSet<>();
   private final Map<UUID, Long> next = new HashMap<>(), rates = new HashMap<>();
+  private final Map<UUID, Long> hubRates = new HashMap<>();
 
   private record Session(String dimension, BlockPos pos) {}
 
@@ -154,6 +155,7 @@ public final class GameRuntime {
       current.next.remove(id);
       current.sessions.remove(id);
       current.rates.remove(id);
+      current.hubRates.remove(id);
     }
   }
 
@@ -184,6 +186,40 @@ public final class GameRuntime {
             },
             false);
     }
+  }
+
+  /** Hub calls arrive off-thread. All Minecraft identity/admission reads are marshalled here. */
+  public static CompletableFuture<String> playerHub(UUID id, String action, JsonObject payload) {
+    GameRuntime runtime = current;
+    if (runtime == null) return CompletableFuture.failedFuture(new IllegalStateException("签历服务尚未就绪"));
+    CompletableFuture<String> response = new CompletableFuture<>();
+    try {
+      runtime.server.execute(() -> {
+        try {
+          ServerPlayer player = runtime.server.getPlayerList().getPlayer(id);
+          if (current != runtime || runtime.stopped || player == null || !real(player))
+            throw new IllegalStateException("玩家会话已失效，请重新打开");
+          try {
+            Class<?> manager = Class.forName("com.pixelmc.pixelmcmanager.api.ManagerBridgeApi");
+            if (!Boolean.TRUE.equals(manager.getMethod("admitted", UUID.class).invoke(null, id)))
+              throw new IllegalStateException("玩家尚未通过入服验证");
+          } catch (ClassNotFoundException standalone) { /* Server connection supplies standalone identity. */ }
+          if (!runtime.registered.contains(id)) throw new IllegalStateException("签历正在加载，请稍后重试");
+          long now = System.nanoTime();
+          if (now < runtime.hubRates.getOrDefault(id, 0L)) throw new IllegalStateException("签历刷新过于频繁，请稍后重试");
+          runtime.hubRates.put(id, now + 250_000_000L);
+          runtime.call(player, "playerHub", action, payload).orTimeout(20, TimeUnit.SECONDS)
+              .whenComplete((value, error) -> runtime.server.execute(() -> {
+                if (current != runtime || runtime.stopped || runtime.server.getPlayerList().getPlayer(id) != player)
+                  response.completeExceptionally(new IllegalStateException("玩家会话已失效，请重新打开"));
+                else if (error != null) response.completeExceptionally(new IllegalStateException(safeError(error)));
+                else response.complete(JSON.toJson(value));
+              }));
+        } catch (Exception invalid) { response.completeExceptionally(new IllegalStateException(safeError(invalid))); }
+      });
+    } catch (RuntimeException stopped) { response.completeExceptionally(new IllegalStateException("签历服务尚未就绪")); }
+    return response.orTimeout(25, TimeUnit.SECONDS).exceptionallyCompose(error ->
+        CompletableFuture.failedFuture(new IllegalStateException(safeError(error))));
   }
 
   private CompletableFuture<JsonObject> call(ServerPlayer p, String op, Object... args) {
@@ -299,15 +335,18 @@ public final class GameRuntime {
     for (int n = 0; n < p.getInventory().getContainerSize(); n++) {
       JsonObject old = FortuneItem.receipt(p.getInventory().getItem(n));
       if (old != null && s(old, "token").equals(token)) {
+        boolean changed = !old.equals(record);
         p.getInventory().setItem(n, FortuneItem.stack(record));
         p.inventoryMenu.broadcastChanges();
         ack(p, record);
+        if (changed) FortuneNetwork.changed(p);
         return;
       }
     }
     if (p.getInventory().add(FortuneItem.stack(record))) {
       p.inventoryMenu.broadcastChanges();
       ack(p, record);
+      FortuneNetwork.changed(p);
     }
   }
 
@@ -382,8 +421,10 @@ public final class GameRuntime {
                                   if (error == null)
                                     r.server.execute(
                                         () -> {
-                                          if (r.server.getPlayerList().getPlayer(p.getUUID()) == p)
+                                          if (r.server.getPlayerList().getPlayer(p.getUUID()) == p) {
                                             r.consume(p, record);
+                                            FortuneNetwork.changed(p);
+                                          }
                                         });
                                   return obj();
                                 }));

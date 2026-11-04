@@ -33,12 +33,14 @@ public final class FortuneClient {
   public static void receive(String type, String json) {
     try {
       JsonObject data = JsonParser.parseString(json).getAsJsonObject();
+      if (type.equals("changed")) { HubInvalidation.received(type, data); return; }
       Minecraft mc = Minecraft.getInstance();
       if (type.equals("read")) mc.setScreen(new ReadingScreen(data, mc.screen));
       else if (type.equals("calendar")) {
         if (mc.screen instanceof CalendarScreen calendar) calendar.update(data);
         else mc.setScreen(new CalendarScreen(data));
       }
+      HubInvalidation.received(type, data);
     } catch (Exception ignored) {
     }
   }
