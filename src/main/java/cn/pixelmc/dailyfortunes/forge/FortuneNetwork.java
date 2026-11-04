@@ -23,5 +23,10 @@ public final class FortuneNetwork {
   r.playToClient(Reply.TYPE,Reply.CODEC,(p,c)->c.enqueueWork(()->FortuneClient.receive(p.typeName,p.json)));
  }
  public static void send(ServerPlayer p,String type,String json){if(p.connection!=null)PacketDistributor.sendToPlayer(p,new Reply(type,json));}
+  /** A committed physical result changed; carries no fortune, receipt, or token. */
+  public static void changed(ServerPlayer player) {
+    try { send(player, "changed", "{}"); } catch (RuntimeException | LinkageError ignored) { /* Optional refresh must not alter a committed physical result. */ }
+  }
+
  public static void request(String action,String value){PacketDistributor.sendToServer(new Request(action,value));}
 }

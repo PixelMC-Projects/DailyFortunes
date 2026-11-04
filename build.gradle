@@ -1,5 +1,5 @@
 plugins { id 'net.neoforged.moddev' version '2.0.148'; id 'com.gradleup.shadow' version '8.3.6' }
-version='0.3.1'
+version='0.4.0-hub.2'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-neoforge-1.21.1' }
 java { toolchain { languageVersion=JavaLanguageVersion.of(21) }; withSourcesJar() }
@@ -66,8 +66,8 @@ if(project.hasProperty('capture')) neoForge.runs.client { jvmArgument '-Ddailyfo
 neoForge.runs.configureEach { additionalRuntimeClasspathConfiguration.extendsFrom(configurations.jdbcDriver) }
 if(project.hasProperty('packaged')) {
  neoForge.runs.configureEach { loadedMods=[project.neoForge.mods.getByName('dailyfortunes_smoke')]; jvmArgument '-Ddailyfortunes.requirePackaged=true' }
- tasks.named('runServer') { doFirst { copy { from file('build/libs/dailyfortunes-neoforge-1.21.1-0.3.1.jar'); into file('run-server/mods') } } }
- tasks.named('runClient') { doFirst { copy { from file('build/libs/dailyfortunes-neoforge-1.21.1-0.3.1.jar'); into file('run-client/mods') } } }
+ tasks.named('runServer') { doFirst { copy { from file("build/libs/dailyfortunes-neoforge-1.21.1-${project.version}.jar"); into file('run-server/mods') } } }
+ tasks.named('runClient') { doFirst { copy { from file("build/libs/dailyfortunes-neoforge-1.21.1-${project.version}.jar"); into file('run-client/mods') } } }
 }
 
 tasks.named('runServer') { dependsOn 'smokeClasses' }
@@ -84,5 +84,11 @@ neoForge {
 }
 tasks.named('runPackagedFlowServer') {
  dependsOn 'smokeClasses'; standardInput=System.in
- doFirst { copy { from file('build/libs/dailyfortunes-neoforge-1.21.1-0.3.1.jar'); into file('run-server/mods') } }
+ doFirst { copy { from file("build/libs/dailyfortunes-neoforge-1.21.1-${project.version}.jar"); into file('run-server/mods') } }
 }
+
+tasks.register("playerHubChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.PlayerHubChecks" }
+tasks.named("check") { dependsOn "playerHubChecks" }
+
+tasks.register("hubInvalidationChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.client.HubInvalidationChecks" }
+tasks.named("check") { dependsOn "hubInvalidationChecks" }

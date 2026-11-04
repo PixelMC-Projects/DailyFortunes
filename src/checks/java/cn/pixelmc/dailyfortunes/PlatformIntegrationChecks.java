@@ -181,12 +181,12 @@ public final class PlatformIntegrationChecks {
     }
     JsonObject manifest = storageManifest();
     check(
-        i(manifest, "version") == 1 && s(manifest, "scope").equals("global"),
+        i(manifest, "version") == 2 && s(manifest, "scope").equals("global"),
         "manifest schema and scope");
     check(
-        manifest.getAsJsonArray("tables").size() == 8
-            && manifest.getAsJsonArray("fields").isEmpty(),
-        "all eight namespace business tables declared");
+        manifest.getAsJsonArray("tables").size() == 9
+            && manifest.getAsJsonArray("fields").size() == 1,
+        "all namespace business tables and typed handbook preference declared");
     System.out.println("Unified platform integration checks passed: " + checks);
   }
 }
