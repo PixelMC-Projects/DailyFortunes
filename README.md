@@ -11,10 +11,10 @@
 
 | Minecraft | Loader | Mod | Branch |
 | --- | --- | --- | --- |
-| 1.20.1 | Forge 47.3+ | 0.3.0 | [forge/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/forge/1.20.1) |
-| 1.20.1 | Fabric Loader 0.16.14+ + Fabric API | 0.3.1 | [fabric/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.20.1) |
-| 1.21.1 | Fabric Loader 0.16.14+ + Fabric API | 0.3.1 | [fabric/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.21.1) |
-| 1.21.1 | NeoForge 21.1+ | 0.3.1 | [neoforge/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/neoforge/1.21.1) |
+| 1.20.1 | Forge 47.3+ | 0.4.0-hub.2 | [forge/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/forge/1.20.1) |
+| 1.20.1 | Fabric Loader 0.16.14+ + Fabric API | 0.4.0-hub.2 | [fabric/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.20.1) |
+| 1.21.1 | Fabric Loader 0.16.14+ + Fabric API | 0.4.0-hub.2 | [fabric/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.21.1) |
+| 1.21.1 | NeoForge 21.1+ | 0.4.0-hub.2 | [neoforge/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/neoforge/1.21.1) |
 
 从 [Releases](https://github.com/PixelMC-Projects/DailyFortunes/releases) 下载匹配游戏和加载器的 JAR；所有版本均须客户端与服务端同时安装。1.20.1 使用 Java 17，1.21.1 使用 Java 21。Classic ZIP 也须匹配游戏版本，独立下载并手动启用。
 
@@ -26,7 +26,7 @@
 
 签筒、解签龛、藏签匣可用竹子、木材、铜、纸等原版材料合成。`/df recover yyyy-MM-dd` 补领已抽取但尚未收藏的原签。打开藏签匣自动收存背包里的已解签笺；左键阅读，右键选择展示，中键清除展示。
 
-喜欢此前的精细木作外观，可下载同版本的 `DailyFortunes-Classic` 资源包，放入 `resourcepacks`，在“选项 → 资源包”手动启用。默认不加载；停用即可恢复原版像素风，签历数据不变。资源包只换外观，碰撞范围以服务器默认模型为准。
+喜欢此前的精细木作外观，可下载对应游戏版本的 `DailyFortunes-Classic` 资源包，放入 `resourcepacks`，在“选项 → 资源包”手动启用。默认不加载；停用即可恢复原版像素风，签历数据不变。资源包只换外观，碰撞范围以服务器默认模型为准。
 
 ## 服务器与网页
 
@@ -55,3 +55,15 @@ Use `/df recover yyyy-MM-dd` to recover an unarchived result. Opening the archiv
 ## License / 许可
 
 Copyright © 2026 zhan_cpu / PixelMC Projects. [AGPL-3.0-only](LICENSE). Preserve author and copyright notices; modified distributions and network-accessible versions must provide corresponding source under the license. 自制模型、纹理及签文随本项目提供；第三方组件见 [THIRD_PARTY.md](THIRD_PARTY.md)。
+
+## Optional Player Hub integration / 玩家手册接口
+
+Development batch / 开发批次: `0.4.0-hub.2` (not a published release / 尚未发布).
+
+The server-side optional provider `cn.pixelmc.dailyfortunes.api.PlayerHubApi` exposes protocol 1 and the own-player `snapshot`, `calendar`, `read`, and `feature` operations. The authenticated game connection supplies the UUID. Hub never remotely draws, interprets, archives, recovers receipts, or changes physical chest displays. Only interpreted today's records or owned archived records can be read; recent collections contain at most 8 archived records and the calendar returns the complete requested month. Historical draw timestamps and stored fortune snapshots are retained.
+
+玩家手册仅开放本人资料、已收藏签历和个人精选，未解之签不会透露结果。精选使用 Manager 已注册的 `dailyfortunes.featured_date` 字段；独立模式仍保存在原存档对应的签文数据库中，不创建第二套玩家数据库。退出或切服后的旧响应会失效。
+
+The storage manifest and `df_schema` are upgraded to version 2 on the next connection to the selected existing database. Standalone backups retain format 1 with an optional `hubPreferences` array, and older backups without that array remain importable. Previous code that supports schema 1 refuses schema 2: rollback requires a retained compatible full database backup restored into an empty target with the matching previous code, rather than an in-place downgrade. Managed rollback must also retain the corresponding Manager unified backup/namespace values.
+
+本次开发只迁移了隔离测试数据库；没有连接或迁移生产数据库。新代码实际连接现有数据库时才会升级到 schema 2。旧代码不能直接打开 schema 2，回退前须保留匹配旧版本的完整数据库备份；独立备份可兼容缺少精选字段的旧格式，Manager 模式须同步保留统一存储备份。

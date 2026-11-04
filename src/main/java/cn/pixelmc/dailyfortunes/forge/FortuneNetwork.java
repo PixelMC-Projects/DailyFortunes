@@ -55,6 +55,11 @@ public final class FortuneNetwork {
       CHANNEL.send(PacketDistributor.PLAYER.with(() -> p), new Reply(type, json));
   }
 
+  /** A committed physical result changed; carries no fortune, receipt, or token. */
+  public static void changed(ServerPlayer player) {
+    try { send(player, "changed", "{}"); } catch (RuntimeException | LinkageError ignored) { /* Optional refresh must not alter a committed physical result. */ }
+  }
+
   public static void request(String action, String value) {
     CHANNEL.sendToServer(new Request(action, value));
   }

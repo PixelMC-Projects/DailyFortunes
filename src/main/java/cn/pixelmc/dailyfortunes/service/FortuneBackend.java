@@ -16,9 +16,10 @@ import java.util.function.Function;
 public final class FortuneBackend implements AutoCloseable {
   public static final Gson JSON = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
   public static final List<String> GRADES = List.of("上上签", "上吉签", "中平签", "小凶签", "下下签");
-  public static final String VERSION = "0.3.0";
+  public static final String VERSION = "0.4.0-hub.2";
   private final String url, user, password;
   private final Path folder;
+  private final Clock clock;
   private final SecureRandom random = new SecureRandom();
   private boolean ready, closed;
   private volatile boolean healthy;
@@ -35,12 +36,17 @@ public final class FortuneBackend implements AutoCloseable {
           });
 
   public FortuneBackend(String url, String user, String password, Path folder) {
+    this(url, user, password, folder, Clock.systemUTC());
+  }
+
+  public FortuneBackend(String url, String user, String password, Path folder, Clock clock) {
     if (url == null || !(url.startsWith("jdbc:mariadb://") || url.startsWith("jdbc:h2:file:")))
       throw new IllegalArgumentException("需要 MariaDB JDBC 地址");
     this.url = url;
     this.user = user;
     this.password = password;
     this.folder = folder.toAbsolutePath().normalize();
+    this.clock = Objects.requireNonNull(clock);
     scheduleBackup();
   }
 
@@ -72,7 +78,7 @@ public final class FortuneBackend implements AutoCloseable {
   public static JsonObject storageManifest() {
     return obj(
         "version",
-        1,
+        2,
         "scope",
         "global",
         "label",
@@ -92,13 +98,14 @@ public final class FortuneBackend implements AutoCloseable {
             "df_records",
             "df_audit",
             "df_ids",
-            "df_requests"),
+            "df_requests",
+            "df_hub_preferences"),
         "fields",
-        List.of(),
+        List.of(obj("id", "featured_date", "type", "string", "scope", "global", "default", "", "maxBytes", 64)),
         "files",
         List.of("definitions.json"),
         "capabilities",
-        List.of("calendar", "receipts", "backup", "conflict-aware-undo"));
+        List.of("calendar", "receipts", "backup", "conflict-aware-undo", "player-hub"));
   }
 
   private JsonObject platformCall(JsonObject request) {
@@ -194,7 +201,7 @@ public final class FortuneBackend implements AutoCloseable {
           "CREATE TABLE IF NOT EXISTS df_schema (id INT PRIMARY KEY, version INT NOT NULL)"
               + " ENGINE=InnoDB");
       long version = number(c, "SELECT COALESCE(MAX(version),0) FROM df_schema");
-      if (version > 1) throw new IllegalStateException("数据库版本高于程序版本");
+      if (version > 2) throw new IllegalStateException("数据库版本高于程序版本");
       exec(
           c,
           "CREATE TABLE IF NOT EXISTS df_settings (id INT PRIMARY KEY, payload LONGTEXT NOT NULL)"
@@ -229,6 +236,8 @@ public final class FortuneBackend implements AutoCloseable {
           c,
           "CREATE TABLE IF NOT EXISTS df_requests (id VARCHAR(100) PRIMARY KEY,player CHAR(36) NOT"
               + " NULL,day CHAR(10) NOT NULL,token CHAR(36) NOT NULL) ENGINE=InnoDB");
+      exec(c, "CREATE TABLE IF NOT EXISTS df_hub_preferences (player CHAR(36) PRIMARY KEY,"
+          + "featured_date VARCHAR(10) NOT NULL,revision BIGINT NOT NULL) ENGINE=InnoDB");
       if (number(c, "SELECT COUNT(*) FROM df_settings") == 0) {
         c.setAutoCommit(false);
         exec(c, "INSERT INTO df_settings VALUES(1,?)", JSON.toJson(defaultSettings()));
@@ -256,6 +265,7 @@ public final class FortuneBackend implements AutoCloseable {
             c,
             "INSERT INTO df_ids VALUES(1,?)",
             number(c, "SELECT COALESCE(MAX(id),0)+1 FROM df_fortunes"));
+      exec(c, "UPDATE df_schema SET version=2 WHERE id=1");
       ready = true;
     } finally {
       if (!url.startsWith("jdbc:h2:")) exec(c, "DO RELEASE_LOCK('dailyfortunes_schema_v1')");
@@ -342,7 +352,7 @@ public final class FortuneBackend implements AutoCloseable {
   }
 
   private String today(Connection c) throws SQLException {
-    return LocalDate.now(ZoneId.of(s(settings(c), "timezone"))).toString();
+    return LocalDate.now(clock.withZone(ZoneId.of(s(settings(c), "timezone")))).toString();
   }
 
   private static void date(String v) {
@@ -392,6 +402,12 @@ public final class FortuneBackend implements AutoCloseable {
           if (coreIdentity == null
               && number(c, "SELECT COUNT(*) FROM df_players WHERE uuid=?", id) == 0)
             throw new IllegalArgumentException("玩家资料尚未加载");
+          if (op.equals("playerHub")) {
+            if (args.size() != 3 || !args.get(1).isJsonPrimitive()
+                || !args.get(1).getAsJsonPrimitive().isString() || !args.get(2).isJsonObject())
+              throw new IllegalArgumentException("签历请求参数无效");
+            return playerHub(c, id, args.get(1).getAsString(), args.get(2).getAsJsonObject());
+          }
           if (op.equals("calendar")) return calendar(c, id, args.get(1).getAsString());
           if (op.equals("pending"))
             return obj(
@@ -426,7 +442,7 @@ public final class FortuneBackend implements AutoCloseable {
                     "state",
                     "unread",
                     "at",
-                    System.currentTimeMillis(),
+                    clock.millis(),
                     "snapshot",
                     f,
                     "token",
@@ -532,6 +548,94 @@ public final class FortuneBackend implements AutoCloseable {
         new JsonArray(),
         false);
     return r;
+  }
+
+  private record HubPreference(String date, long revision) { }
+
+  private HubPreference hubPreference(Connection c, String id) throws Exception {
+    HubPreference value;
+    if (platform != null) {
+      JsonObject stored = platformCall(obj("op", "storage.get", "player", id, "field", "featured_date"));
+      value = new HubPreference(stored.get("value").getAsString(), l(stored, "revision"));
+    } else {
+      try (PreparedStatement query = prepare(c, "SELECT featured_date,revision FROM df_hub_preferences WHERE player=? FOR UPDATE", id);
+          ResultSet result = query.executeQuery()) {
+        value = result.next() ? new HubPreference(result.getString(1), result.getLong(2)) : new HubPreference("", 0);
+      }
+    }
+    if (!value.date().isEmpty()) {
+      JsonObject record = record(c, id, value.date());
+      if (record == null || !s(record, "state").equals("archived"))
+        value = hubStorePreference(c, id, "", value.revision());
+    }
+    return value;
+  }
+
+  private HubPreference hubStorePreference(Connection c, String id, String date, long expected) throws Exception {
+    if (platform != null) {
+      JsonObject stored = platformCall(obj("op", "storage.set", "player", id, "field", "featured_date",
+          "value", date, "expectedRevision", expected));
+      return new HubPreference(stored.get("value").getAsString(), l(stored, "revision"));
+    }
+    exec(c, "INSERT INTO df_hub_preferences(player,featured_date,revision) VALUES(?,?,?) ON DUPLICATE KEY UPDATE featured_date=VALUES(featured_date),revision=VALUES(revision)", id, date, Math.addExact(expected, 1));
+    return new HubPreference(date, expected + 1);
+  }
+
+  private static JsonObject hubRecord(JsonObject record) {
+    if (!Set.of("loose", "archived").contains(s(record, "state")))
+      throw new IllegalStateException("签笺尚未解读");
+    JsonObject fortune = record.getAsJsonObject("snapshot"), safe = new JsonObject();
+    for (String field : List.of("id", "title", "grade", "poem", "interpretation"))
+      safe.add(field, fortune.get(field).deepCopy());
+    return obj("id", s(record, "id"), "date", s(record, "date"), "at", l(record, "at"), "fortune", safe);
+  }
+
+  private JsonObject hubSnapshot(Connection c, String id, HubPreference preference) throws Exception {
+    String day = today(c), timezone = s(settings(c), "timezone");
+    JsonObject drawn = record(c, id, day), featured = preference.date().isEmpty() ? null : record(c, id, preference.date());
+    String state = drawn == null ? "undrawn" : s(drawn, "state").equals("loose") ? "read" : s(drawn, "state");
+    JsonObject todayRecord = drawn != null && (state.equals("read") || state.equals("archived")) ? hubRecord(drawn) : null;
+    List<JsonObject> recent = rows(c, "SELECT payload FROM df_records WHERE player=? AND state='archived' ORDER BY day DESC LIMIT 8", id)
+        .stream().map(FortuneBackend::hubRecord).toList();
+    JsonObject result = obj("timezone", timezone, "today", day, "todayState", state,
+        "todayRecord", todayRecord, "archiveCount", number(c, "SELECT COUNT(*) FROM df_records WHERE player=? AND state='archived'", id),
+        "recent", recent, "featuredDate", featured == null ? null : preference.date(),
+        "featuredRecord", featured == null ? null : hubRecord(featured));
+    // Only safe visible state contributes to the opaque revision; unread content never does.
+    result.addProperty("revision", hash(id + ":" + preference.revision() + ":" + JSON.toJson(result)));
+    return result;
+  }
+
+  private JsonObject playerHub(Connection c, String id, String action, JsonObject payload) throws Exception {
+    PlayerHubRequests.validate(action, payload);
+    HubPreference preference = hubPreference(c, id);
+    JsonObject snapshot = hubSnapshot(c, id, preference);
+    if (action.equals("snapshot")) return snapshot;
+    if (action.equals("feature")) {
+      if (!s(snapshot, "revision").equals(s(payload, "expectedRevision")))
+        throw new IllegalStateException("签历已更新，请刷新后重试");
+      String chosen = s(payload, "date");
+      if (!chosen.isEmpty()) {
+        JsonObject record = record(c, id, chosen);
+        if (record == null || !s(record, "state").equals("archived"))
+          throw new IllegalArgumentException("只能选择自己已收藏的签笺");
+      }
+      HubPreference committed = hubStorePreference(c, id, chosen, preference.revision());
+      return hubSnapshot(c, id, committed);
+    }
+    if (action.equals("calendar")) {
+      YearMonth month = YearMonth.parse(s(payload, "month"));
+      return obj("revision", s(snapshot, "revision"), "month", month.toString(), "today", s(snapshot, "today"),
+          "timezone", s(snapshot, "timezone"), "records",
+          rows(c, "SELECT payload FROM df_records WHERE player=? AND state='archived' AND day>=? AND day<=? ORDER BY day", id,
+              month.atDay(1).toString(), month.atEndOfMonth().toString()).stream().map(FortuneBackend::hubRecord).toList());
+    }
+    String chosen = s(payload, "date");
+    JsonObject record = record(c, id, chosen);
+    if (record == null || !(s(record, "state").equals("archived")
+        || chosen.equals(s(snapshot, "today")) && s(record, "state").equals("loose")))
+      throw new IllegalArgumentException("只能阅读已收藏的签笺或今日已解的签");
+    return hubRecord(record);
   }
 
   private JsonObject calendar(Connection c, String id, String month) throws SQLException {
@@ -1283,7 +1387,8 @@ public final class FortuneBackend implements AutoCloseable {
     }
     count +=
         number(c, "SELECT COUNT(*) FROM df_players")
-            + number(c, "SELECT COUNT(*) FROM df_requests");
+            + number(c, "SELECT COUNT(*) FROM df_requests")
+            + number(c, "SELECT COUNT(*) FROM df_hub_preferences");
     if (bytes > 16L * 1024 * 1024 || count > 50000)
       throw new IllegalStateException("数据量超出内置备份容量，请使用数据库服务备份工具");
     JsonObject data = config(c);
@@ -1315,6 +1420,11 @@ public final class FortuneBackend implements AutoCloseable {
                 rs.getString(4)));
     }
     data.add("requests", requests);
+    JsonArray preferences = new JsonArray();
+    try (Statement statement = c.createStatement(); ResultSet rows = statement.executeQuery("SELECT player,featured_date,revision FROM df_hub_preferences ORDER BY player")) {
+      while (rows.next()) preferences.add(obj("player", rows.getString(1), "date", rows.getString(2), "revision", rows.getLong(3)));
+    }
+    data.add("hubPreferences", preferences);
     String text = JSON.toJson(data);
     if (text.getBytes(StandardCharsets.UTF_8).length > 64 * 1024 * 1024)
       throw new IllegalStateException("备份超过64MiB，请使用数据库服务的备份工具");
@@ -1481,6 +1591,19 @@ public final class FortuneBackend implements AutoCloseable {
         throw new IllegalArgumentException("补领票据引用无效");
       UUID.fromString(s(req, "token"));
     }
+    Set<String> preferencePlayers = new HashSet<>();
+    if (file.has("hubPreferences")) for (JsonElement entry : file.getAsJsonArray("hubPreferences")) {
+      JsonObject preference = entry.getAsJsonObject();
+      String player = s(preference, "player"), selected = s(preference, "date");
+      if (!players.contains(player) || !preferencePlayers.add(player) || l(preference, "revision") < 0)
+        throw new IllegalArgumentException("藏签选择资料无效");
+      if (!selected.isEmpty()) {
+        date(selected);
+        JsonObject owned = records.get(player + ":" + selected);
+        if (owned == null || !s(owned, "state").equals("archived"))
+          throw new IllegalArgumentException("藏签选择引用无效");
+      }
+    }
   }
 
   public JsonObject restoreEmpty(Path source, String confirmation) {
@@ -1497,6 +1620,7 @@ public final class FortuneBackend implements AutoCloseable {
           if (number(c, "SELECT COUNT(*) FROM df_players")
                   + number(c, "SELECT COUNT(*) FROM df_records")
                   + number(c, "SELECT COUNT(*) FROM df_audit")
+                  + number(c, "SELECT COUNT(*) FROM df_hub_preferences")
               != 0) throw new IllegalStateException("恢复仅允许目标数据库为空");
           exec(c, "DELETE FROM df_fortunes");
           for (JsonElement e : snapshot.getAsJsonArray("fortunes")) {
@@ -1541,6 +1665,11 @@ public final class FortuneBackend implements AutoCloseable {
                 s(r, "player"),
                 s(r, "day"),
                 s(r, "token"));
+          }
+          if (snapshot.has("hubPreferences")) for (JsonElement entry : snapshot.getAsJsonArray("hubPreferences")) {
+            JsonObject preference = entry.getAsJsonObject();
+            exec(c, "INSERT INTO df_hub_preferences(player,featured_date,revision) VALUES(?,?,?)",
+                s(preference, "player"), s(preference, "date"), l(preference, "revision"));
           }
           for (JsonElement e : snapshot.getAsJsonArray("audit")) {
             JsonObject a = e.getAsJsonObject();

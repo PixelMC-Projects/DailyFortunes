@@ -4,7 +4,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.github.johnrengelman.shadow'
-version='0.3.0'
+version='0.4.0-hub.2'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-forge-1.20.1' }
 java { toolchain { languageVersion=JavaLanguageVersion.of(17) } }
@@ -73,3 +73,9 @@ tasks.named('check') { dependsOn 'rpcResponseChecks' }
 
 tasks.register('displaySelectionChecks',JavaExec) { dependsOn 'checksClasses'; classpath=sourceSets.checks.runtimeClasspath; mainClass='cn.pixelmc.dailyfortunes.DisplaySelectionChecks' }
 tasks.named('check') { dependsOn 'displaySelectionChecks' }
+
+tasks.register("playerHubChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.PlayerHubChecks" }
+tasks.named("check") { dependsOn "playerHubChecks" }
+
+tasks.register("hubInvalidationChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.client.HubInvalidationChecks" }
+tasks.named("check") { dependsOn "hubInvalidationChecks" }
