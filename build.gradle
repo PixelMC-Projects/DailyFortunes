@@ -2,7 +2,7 @@ plugins {
  id 'fabric-loom' version '1.7.4'
  id 'com.gradleup.shadow' version '8.3.6'
 }
-version='0.3.1'
+version='0.4.0-hub.2'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-fabric-1.21.1' }
 java { toolchain { languageVersion=JavaLanguageVersion.of(21) }; withSourcesJar() }
@@ -58,3 +58,9 @@ if(project.hasProperty('connectAddress')) tasks.named('runClient') { jvmArgs '-D
 if(project.hasProperty('capture')) tasks.named('runClient') { jvmArgs '-Ddailyfortunes.capture=true' }
 
 loom { runs { client { runDir='run-client' }; server { runDir='run-server' } } }
+
+tasks.register("playerHubChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.PlayerHubChecks" }
+tasks.named("check") { dependsOn "playerHubChecks" }
+
+tasks.register("hubInvalidationChecks",JavaExec) { dependsOn "checksClasses"; classpath=sourceSets.checks.runtimeClasspath; mainClass="cn.pixelmc.dailyfortunes.client.HubInvalidationChecks" }
+tasks.named("check") { dependsOn "hubInvalidationChecks" }

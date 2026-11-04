@@ -21,5 +21,10 @@ public final class FortuneNetwork {
   ServerPlayNetworking.registerGlobalReceiver(Request.TYPE,(p,c)->c.server().execute(()->GameRuntime.request(c.player(),p.action,p.value)));
  }
  public static void send(ServerPlayer p,String type,String json){if(p.connection!=null)ServerPlayNetworking.send(p,new Reply(type,json));}
+  /** A committed physical result changed; carries no fortune, receipt, or token. */
+  public static void changed(ServerPlayer player) {
+    try { send(player, "changed", "{}"); } catch (RuntimeException | LinkageError ignored) { /* Optional refresh must not alter a committed physical result. */ }
+  }
+
  public static void request(String action,String value){cn.pixelmc.dailyfortunes.client.FabricClient.send(action,value);}
 }
