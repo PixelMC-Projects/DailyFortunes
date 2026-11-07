@@ -4,17 +4,17 @@
 
 - 六十篇签文，独立权重；吉凶只用于阅读与收藏，没有奖励或惩罚。
 - 按日期保存个人签历，遗失可补领原签，不能重抽或赠送。
-- 原版像素风的中式木作与植物模型；签筒内的签会随动作晃动，碰撞后停在新位置。
+- 原版像素风的中式木作与植物模型；手持签筒内的签会随动作晃动，放置后静止。
 - 可在藏签匣上展示收藏，瞄准时阅读；支持 PixelMC Manager 网页管理。
 
 ## 支持版本 / Supported versions
 
 | Minecraft | Loader | Mod | Branch |
 | --- | --- | --- | --- |
-| 1.20.1 | Forge 47.3+ | 0.4.0-hub.2 | [forge/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/forge/1.20.1) |
-| 1.20.1 | Fabric Loader 0.16.14+ + Fabric API | 0.4.0-hub.2 | [fabric/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.20.1) |
-| 1.21.1 | Fabric Loader 0.16.14+ + Fabric API | 0.4.0-hub.2 | [fabric/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.21.1) |
-| 1.21.1 | NeoForge 21.1+ | 0.4.0-hub.2 | [neoforge/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/neoforge/1.21.1) |
+| 1.20.1 | Forge 47.3+ | 0.3.0 | [forge/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/forge/1.20.1) |
+| 1.20.1 | Fabric Loader 0.16.14+ + Fabric API | 0.3.1 | [fabric/1.20.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.20.1) |
+| 1.21.1 | Fabric Loader 0.16.14+ + Fabric API | 0.3.1 | [fabric/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/fabric/1.21.1) |
+| 1.21.1 | NeoForge 21.1+ | 0.3.1 | [neoforge/1.21.1](https://github.com/PixelMC-Projects/DailyFortunes/tree/neoforge/1.21.1) |
 
 从 [Releases](https://github.com/PixelMC-Projects/DailyFortunes/releases) 下载匹配游戏和加载器的 JAR；所有版本均须客户端与服务端同时安装。1.20.1 使用 Java 17，1.21.1 使用 Java 21。Classic ZIP 也须匹配游戏版本，独立下载并手动启用。
 
@@ -24,9 +24,9 @@
 
 单人游戏只需将 JAR 放入 `mods`。默认使用内置本地数据库，数据保存在游戏目录的 `config/dailyfortunes/local-data/worlds/<存档ID>`，无需另装数据库。进入世界后等待约 10 秒加载签历。
 
-签筒、解签龛、藏签匣可用竹子、木材、铜、纸等原版材料合成。`/df recover yyyy-MM-dd` 补领已抽取但尚未收藏的原签。打开藏签匣自动收存背包里的已解签笺；左键阅读，右键选择展示，中键清除展示。
+签筒、解签龛、藏签匣可用竹子、木材、铜、纸等原版材料合成。本地 Forge 1.20.1 候选中，手持签筒普通右键抽签，蹲下对方块右键放置；右键已放置的签筒也可抽签，按每位玩家每日一次计算。放置后没有物理动画。`/df recover yyyy-MM-dd` 补领已抽取但尚未收藏的原签。打开藏签匣自动收存背包里的已解签笺；左键阅读，右键选择展示，中键清除展示。
 
-喜欢此前的精细木作外观，可下载对应游戏版本的 `DailyFortunes-Classic` 资源包，放入 `resourcepacks`，在“选项 → 资源包”手动启用。默认不加载；停用即可恢复原版像素风，签历数据不变。资源包只换外观，碰撞范围以服务器默认模型为准。
+喜欢此前的精细木作外观，可下载同版本的 `DailyFortunes-Classic` 资源包，放入 `resourcepacks`，在“选项 → 资源包”手动启用。默认不加载；停用即可恢复原版像素风，签历数据不变。资源包只换外观，碰撞范围以服务器默认模型为准。
 
 ## 服务器与网页
 
@@ -50,6 +50,8 @@ Install on **both sides with Minecraft 1.20.1 / Forge 47.3+**. Singleplayer uses
 
 Before upgrading an existing separate database, stop the server, back up, and copy all `df_*` tables into the new unified database. Keep the original database for rollback. Migrations must preserve receipt tokens and historical snapshots and must not simulate player logins.
 
+In the local Forge 1.20.1 candidate, right-click with a held barrel to draw, or sneak-right-click a block to place it. Right-click a placed barrel to draw; the daily limit remains per player. Placed barrels are static.
+
 Use `/df recover yyyy-MM-dd` to recover an unarchived result. Opening the archive stores your interpreted slips; left-click to read, right-click to display. Server collections survive world changes; singleplayer saves have separate quotas and collections. Manager coordinates managed backups; standalone backups run every 12 hours by default.
 
 ## License / 许可
@@ -58,7 +60,7 @@ Copyright © 2026 zhan_cpu / PixelMC Projects. [AGPL-3.0-only](LICENSE). Preserv
 
 ## Optional Player Hub integration / 玩家手册接口
 
-Development batch / 开发批次: `0.4.0-hub.2` (not a published release / 尚未发布).
+Development batch / 开发批次: `0.4.0-hub.3` (not a published release / 尚未发布).
 
 The server-side optional provider `cn.pixelmc.dailyfortunes.api.PlayerHubApi` exposes protocol 1 and the own-player `snapshot`, `calendar`, `read`, and `feature` operations. The authenticated game connection supplies the UUID. Hub never remotely draws, interprets, archives, recovers receipts, or changes physical chest displays. Only interpreted today's records or owned archived records can be read; recent collections contain at most 8 archived records and the calendar returns the complete requested month. Historical draw timestamps and stored fortune snapshots are retained.
 

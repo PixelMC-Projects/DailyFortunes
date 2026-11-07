@@ -4,7 +4,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.github.johnrengelman.shadow'
-version='0.4.0-hub.2'
+version='0.4.0-hub.3'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-forge-1.20.1' }
 java { toolchain { languageVersion=JavaLanguageVersion.of(17) } }

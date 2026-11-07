@@ -1,1 +1,8 @@
-{"replace": false, "values": ["dailyfortunes:interpretation_shrine", "dailyfortunes:collection_chest"]}
+{
+  "replace": false,
+  "values": [
+    "dailyfortunes:interpretation_shrine",
+    "dailyfortunes:collection_chest",
+    "dailyfortunes:fortune_barrel"
+  ]
+}

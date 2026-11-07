@@ -21,8 +21,10 @@ public final class DailyFortunes {
       DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ID);
   public static final DeferredRegister<CreativeModeTab> TABS =
       DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
+  public static final RegistryObject<Block> BARREL_BLOCK =
+      BLOCKS.register("fortune_barrel", FortuneBarrelBlock::new);
   public static final RegistryObject<Item> BARREL =
-      ITEMS.register("fortune_barrel", () -> new FortuneItem(FortuneItem.Kind.BARREL));
+      ITEMS.register("fortune_barrel", () -> new FortuneBarrelItem(BARREL_BLOCK.get()));
   public static final RegistryObject<Item> UNREAD =
       ITEMS.register("unread_slip", () -> new FortuneItem(FortuneItem.Kind.UNREAD));
   public static final RegistryObject<Item> SLIP =
