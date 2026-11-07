@@ -1,1 +1,11 @@
-{"item.dailyfortunes.fortune_barrel": "问津签筒", "item.dailyfortunes.unread_slip": "未解之签", "item.dailyfortunes.fortune_slip": "签笺", "block.dailyfortunes.interpretation_shrine": "解签龛", "block.dailyfortunes.collection_chest": "藏签匣", "itemGroup.dailyfortunes": "每日一签"}
+{
+  "item.dailyfortunes.fortune_barrel": "问津签筒",
+  "item.dailyfortunes.unread_slip": "未解之签",
+  "item.dailyfortunes.fortune_slip": "签笺",
+  "block.dailyfortunes.interpretation_shrine": "解签龛",
+  "block.dailyfortunes.collection_chest": "藏签匣",
+  "itemGroup.dailyfortunes": "每日一签",
+  "block.dailyfortunes.fortune_barrel": "问津签筒",
+  "tooltip.dailyfortunes.fortune_barrel.draw": "每日一次，普通右键问签",
+  "tooltip.dailyfortunes.fortune_barrel.place": "蹲下右键放置；放置后右键问签"
+}

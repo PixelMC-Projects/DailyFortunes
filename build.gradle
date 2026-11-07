@@ -1,5 +1,5 @@
 plugins { id 'net.neoforged.moddev' version '2.0.148'; id 'com.gradleup.shadow' version '8.3.6' }
-version='0.4.0-hub.2'
+version='0.4.0-hub.3'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-neoforge-1.21.1' }
 java { toolchain { languageVersion=JavaLanguageVersion.of(21) }; withSourcesJar() }

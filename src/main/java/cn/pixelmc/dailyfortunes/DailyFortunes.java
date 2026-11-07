@@ -21,8 +21,10 @@ public final class DailyFortunes {
       DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, ID);
   public static final DeferredRegister<CreativeModeTab> TABS =
       DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
+  public static final java.util.function.Supplier<Block> BARREL_BLOCK =
+      BLOCKS.register("fortune_barrel", FortuneBarrelBlock::new);
   public static final java.util.function.Supplier<Item> BARREL =
-      ITEMS.register("fortune_barrel", () -> new FortuneItem(FortuneItem.Kind.BARREL));
+      ITEMS.register("fortune_barrel", () -> new FortuneBarrelItem(BARREL_BLOCK.get()));
   public static final java.util.function.Supplier<Item> UNREAD =
       ITEMS.register("unread_slip", () -> new FortuneItem(FortuneItem.Kind.UNREAD));
   public static final java.util.function.Supplier<Item> SLIP =

@@ -3,7 +3,7 @@ loaderVersion="[4,)"
 license="AGPL-3.0-only"
 [[mods]]
 modId="dailyfortunes"
-version="0.4.0-hub.2"
+version="0.4.0-hub.3"
 displayName="DailyFortunes"
 authors="zhan_cpu / PixelMC Projects"
 description='''每日一签 / Daily fortunes, interpretation and permanent collections.'''

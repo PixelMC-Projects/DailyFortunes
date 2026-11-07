@@ -16,7 +16,7 @@ import java.util.function.Function;
 public final class FortuneBackend implements AutoCloseable {
   public static final Gson JSON = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
   public static final List<String> GRADES = List.of("上上签", "上吉签", "中平签", "小凶签", "下下签");
-  public static final String VERSION = "0.4.0-hub.2";
+  public static final String VERSION = "0.4.0-hub.3";
   private final String url, user, password;
   private final Path folder;
   private final Clock clock;
@@ -143,6 +143,32 @@ public final class FortuneBackend implements AutoCloseable {
       players.add(player.deepCopy());
     }
     return players;
+  }
+
+  /** Trusted-server aggregate read. No unread text, calendar records or player credentials leave the owner. */
+  public Map<UUID, Long> archivedKindCounts() {
+    JsonObject result = transaction(c -> {
+      JsonObject values = new JsonObject();
+      try (PreparedStatement query = prepare(c, "SELECT player,COUNT(DISTINCT fortune) kind_count "
+              + "FROM df_records WHERE state='archived' GROUP BY player ORDER BY player LIMIT 100001");
+           ResultSet counts = query.executeQuery()) {
+        while (counts.next()) {
+          if (values.size() >= 100000) throw new IllegalStateException("签种排行基线超出容量，请先扩容");
+          values.addProperty(counts.getString(1), counts.getLong(2));
+        }
+      }
+      return values;
+    });
+    Map<UUID, Long> counts = new LinkedHashMap<>();
+    result.entrySet().forEach(entry -> counts.put(UUID.fromString(entry.getKey()), entry.getValue().getAsLong()));
+    return Map.copyOf(counts);
+  }
+
+  public long archivedKindCount(UUID player) {
+    Objects.requireNonNull(player, "player");
+    return transaction(c -> obj("count", number(c,
+        "SELECT COUNT(DISTINCT fortune) FROM df_records WHERE player=? AND state='archived'",
+        player.toString()))).get("count").getAsLong();
   }
 
   public JsonObject status() {
@@ -605,6 +631,40 @@ public final class FortuneBackend implements AutoCloseable {
     result.addProperty("revision", hash(id + ":" + preference.revision() + ":" + JSON.toJson(result)));
     return result;
   }
+
+  /** Trusted unified-service read adapter. The supplied connection joins the caller's transaction. */
+  public JsonObject communityChoices(Connection c, UUID player, long from, long through, int page, int size) throws SQLException {
+    if (platform == null) throw new IllegalStateException("社区签笺展示需要统一平台存储");
+    if (page < 0 || page > 100000 || size < 1 || size > 100 || from < 0 || through < from) throw new IllegalArgumentException("签笺候选查询范围无效");
+    String id = Objects.requireNonNull(player).toString();
+    long count = number(c, "SELECT COUNT(*) FROM df_records WHERE player=? AND state='archived' AND at_ms>=? AND at_ms<=?", id, from, through);
+    List<JsonObject> result = rows(c, "SELECT payload FROM df_records WHERE player=? AND state='archived' AND at_ms>=? AND at_ms<=? ORDER BY at_ms DESC,day DESC LIMIT ? OFFSET ?", id, from, through, size, (long) page * size)
+        .stream().map(FortuneBackend::communityRecord).toList();
+    return obj("rows", result, "total", count, "page", page, "size", size, "hasMore", (long) (page + 1) * size < count, "status", "ready");
+  }
+
+  public JsonObject communityChoice(Connection c, UUID player, String date, boolean lock) throws SQLException {
+    if (platform == null) throw new IllegalStateException("社区签笺展示需要统一平台存储");
+    LocalDate.parse(date);
+    List<JsonObject> values = rows(c, "SELECT payload FROM df_records WHERE player=? AND day=? AND state='archived'" + (lock ? " FOR UPDATE" : ""), Objects.requireNonNull(player).toString(), date);
+    return values.isEmpty() ? null : communityRecord(values.get(0));
+  }
+
+  public JsonObject communityChoiceById(Connection c, UUID player, String event, boolean lock) throws SQLException {
+    if (!event.matches("\\d{4}-\\d{2}-\\d{2}:\\d{1,16}")) return null;
+    String date = event.substring(0, 10);
+    JsonObject value = communityChoice(c, player, date, lock);
+    return value != null && event.equals(s(value, "recordId")) ? value : null;
+  }
+
+  private static JsonObject communityRecord(JsonObject record) {
+    if (!s(record, "state").equals("archived")) throw new IllegalArgumentException("仅归档签可公开展示");
+    JsonObject snapshot = record.getAsJsonObject("snapshot");
+    return obj("id", snapshot.get("id"), "recordId", s(record, "date") + ":" + l(record, "at"),
+        "date", s(record, "date"), "obtainedAt", l(record, "at"), "status", "archived",
+        "title", snapshot.get("title"), "grade", snapshot.get("grade"), "poem", snapshot.get("poem"));
+  }
+
 
   private JsonObject playerHub(Connection c, String id, String action, JsonObject payload) throws Exception {
     PlayerHubRequests.validate(action, payload);
