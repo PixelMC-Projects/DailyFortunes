@@ -13,7 +13,8 @@ public final class DailyFortunes implements ModInitializer {
  public static final String ID="dailyfortunes";
  public record Entry<T>(T value) implements Supplier<T> { public T get(){return value;} }
  private static <T,V extends T> Entry<V> add(Registry<T> registry,String id,V value){ Registry.register(registry,new ResourceLocation(ID,id),value);return new Entry<>(value); }
- public static final Entry<Item> BARREL=add(BuiltInRegistries.ITEM,"fortune_barrel",new FortuneItem(FortuneItem.Kind.BARREL));
+ public static final Entry<Block> BARREL_BLOCK=add(BuiltInRegistries.BLOCK,"fortune_barrel",new FortuneBarrelBlock());
+ public static final Entry<Item> BARREL=add(BuiltInRegistries.ITEM,"fortune_barrel",new FortuneBarrelItem(BARREL_BLOCK.get()));
  public static final Entry<Item> UNREAD=add(BuiltInRegistries.ITEM,"unread_slip",new FortuneItem(FortuneItem.Kind.UNREAD));
  public static final Entry<Item> SLIP=add(BuiltInRegistries.ITEM,"fortune_slip",new FortuneItem(FortuneItem.Kind.SLIP));
  public static final Entry<Block> SHRINE=add(BuiltInRegistries.BLOCK,"interpretation_shrine",new FortuneBlock(false));

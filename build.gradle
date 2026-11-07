@@ -2,7 +2,7 @@ plugins {
  id 'fabric-loom' version '1.7.4'
  id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
-version='0.4.0-hub.2'
+version='0.4.0-hub.3'
 group='cn.pixelmc.dailyfortunes'
 base { archivesName='dailyfortunes-fabric-1.20.1' }
 java { toolchain { languageVersion=JavaLanguageVersion.of(17) }; withSourcesJar() }

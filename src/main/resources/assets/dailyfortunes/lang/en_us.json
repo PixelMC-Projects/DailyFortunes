@@ -1,1 +1,11 @@
-{"item.dailyfortunes.fortune_barrel": "Fortune Barrel", "item.dailyfortunes.unread_slip": "Unread Fortune", "item.dailyfortunes.fortune_slip": "Fortune Slip", "block.dailyfortunes.interpretation_shrine": "Interpretation Shrine", "block.dailyfortunes.collection_chest": "Fortune Archive", "itemGroup.dailyfortunes": "Daily Fortunes"}
+{
+  "item.dailyfortunes.fortune_barrel": "Fortune Barrel",
+  "item.dailyfortunes.unread_slip": "Unread Fortune",
+  "item.dailyfortunes.fortune_slip": "Fortune Slip",
+  "block.dailyfortunes.interpretation_shrine": "Interpretation Shrine",
+  "block.dailyfortunes.collection_chest": "Fortune Archive",
+  "itemGroup.dailyfortunes": "Daily Fortunes",
+  "block.dailyfortunes.fortune_barrel": "Fortune Barrel",
+  "tooltip.dailyfortunes.fortune_barrel.draw": "Right-click to draw once each day",
+  "tooltip.dailyfortunes.fortune_barrel.place": "Sneak-right-click to place; right-click placed barrel to draw"
+}

@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "dailyfortunes:block/fortune_barrel",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "dailyfortunes:block/fortune_barrel",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "dailyfortunes:block/fortune_barrel",
+      "y": 0
+    },
+    "facing=west": {
+      "model": "dailyfortunes:block/fortune_barrel",
+      "y": 90
+    }
+  }
+}
